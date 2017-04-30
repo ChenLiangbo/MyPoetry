@@ -1,0 +1,25 @@
+				==================================
+				||		深度学习生成古诗词研究	||
+				==================================
+
+核心思想：论文[4]，首先给定一句话(短语，句子，短文)从这句话中提取出关键词，根据对应的每一个关键词生成对应的每一句古诗。由于生成的古诗的句数是固定的，因此所使用的关键词数目也也是固定的，如果关键词太多，则顺着前面选择，如果关键词太少，则需要进行扩充。扩充关键词可以根据额外的资源，比如维基百科，查找到相应的关键词，之后使用encoder-decoder 模型，以第一个关键词生成第一句，根据第一句和第二个关键词生成第二句，后面的每一句都使用对应的关键词以及前面生成的所有的诗，最终生成整首诗。
+
+核心技术：关键词提取，关键词扩充，encoder-decoder模型，评价指标
+
+【关键词提取】 ---- 论文[8]
+---- 算法一
+	--名称：TextRank，关键词提取，关键短语提取，摘要生成
+	--工具：TextRank4ZH 用于自动从中文文本中提取关键词和摘要，基于 TextRank 算法，使用 Python 编写
+	--来源：http://www.oschina.net/p/textrank4zh/
+	--理论：Mihalcea R, Tarau P. TextRank: Bringing order into texts[C]. Association for Computational Linguistics, 2004.
+		  ：https://my.oschina.net/letiantian/blog/351154
+	--思想：一个句子的任何两个单词之间都存在一条无向无权边，根据此图计算每个单词的重要性，最重要的若干单词作为关键词
+	--安装：pip install textrank4zh
+---- 算法二
+	--名称：快速自动提取关键词(RAKE)算法
+	--工具：rake
+	--来源：http://www.open-open.com/lib/view/open1421808449078.html
+		  :http://python.jobbole.com/82230/
+	--理论：M. W. Berry and J. Kogan (Eds.), Text Mining: Applications and Theory.unknown: John Wiley and Sons, Ltd
+	--备注：目前没有对中文的应用例子
+		  ：

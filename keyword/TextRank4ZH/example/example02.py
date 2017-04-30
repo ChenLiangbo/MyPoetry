@@ -1,6 +1,3 @@
-#!usr/bin/env/python 
-# -*- coding: utf-8 -*-
-
 #-*- encoding:utf-8 -*-
 from __future__ import print_function
 import codecs
@@ -22,13 +19,6 @@ print()
 print('sentences:')
 for s in tr4w.sentences:
     print(s)                 # py2中是unicode类型。py3中是str类型。
-
-word = TextRank4Keyword()
-word.analyze(text,window = 2,lower = True)
-w_list = word.get_keywords(num = 20,word_min_len = 1)
-print("-"*20 + "key words" + '-'*20 )
-for w in w_list:
-	print("word = %s,weight = %f "% (w.word,w.weight))
 
 print()
 print('words_no_filter')

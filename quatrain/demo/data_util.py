@@ -5,7 +5,7 @@ import collections
 import numpy as np
 from textrank4zh import TextRank4Keyword
 
-# 数据预处理
+# 读取诗歌数据，生成以一首诗为元素的列表
 # 诗集 ['偶寻半开梅,闲倚一竿竹,儿童不知春,问草何故绿','','']
 def read_data(poetry_file):
     poetrys = []
@@ -22,6 +22,7 @@ def read_data(poetry_file):
 	    		pass
     return poetrys
 
+# 由一首诗 使用TextRank算法提取关键词，生成 [关键词，前文，当前行]组成的数据
 # ['梅', '', '偶寻半开梅']
 # ['闲', '偶寻半开梅', '闲倚一竿竹']
 # ['儿童', '偶寻半开梅,闲倚一竿竹', '儿童不知春']
@@ -53,8 +54,7 @@ def keyword_poem(poetry_file):
     		j = j + 1
     		if j % 100 == 0:
     			print("j = ",j)
-    			break
-
+    			# break
     		# break
     return poetrys
 
@@ -66,6 +66,7 @@ def polish_poem(keyword_poetrys):
 			poetrys.append(kp)
 	return poetrys
 
+# 根据原始的诗词生成词库，将词库按照词出现的频率排列，频率大的靠前
 def get_vocabulary(origin_poetrys):
 	poetrys = sorted(origin_poetrys,key=lambda line: len(line)) # 按诗的字数排序
 	# 统计每个字出现次数
@@ -82,7 +83,8 @@ def get_vocabulary(origin_poetrys):
 	word_num_map = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
 	return vocabulary,word_num_map
 
-
+# get max length of poem,[keyword,pre-context,line]
+# 确定每个部分的最大长度，关键词，前文，当前行
 def max_keyword(keyword_poetrys):
 	max_list = [0,0,0]
 	for kp in keyword_poetrys:
@@ -92,10 +94,10 @@ def max_keyword(keyword_poetrys):
 			max_list[1] = len(kp[1])
 		if len(kp[2]) > max_list[2]:
 			max_list[2] = len(kp[2])
-			print("kp2 = ",kp)
+			# print("kp2 = ",kp)
 	return max_list
 
-
+# a string line poem to number list
 def string_to_num(aline,word_num_map):
 	if len(aline) == 0:
 		return [0,]
@@ -110,27 +112,27 @@ def string_to_num(aline,word_num_map):
 # y[0:7]  = line
 
 def poem_to_vector(keyword_poetrys,vocabulary):
-	keyword_max = max_keyword(keyword_poetrys)
+	max_list = max_keyword(keyword_poetrys)
 	word_num_map = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
 	xdata = []
 	ydata = []
 	for kp in keyword_poetrys:
-		print("kp = ",kp)
+		# print("kp = ",kp)
 		x1 = [0]*max_list[0]
-		n1 = string_to_num(kp[0])
+		n1 = string_to_num(kp[0],word_num_map)
 		x1[:len(n1)] = n1
 		x2 = [0]*max_list[1]
-		n2 = string_to_num(kp[1])
+		n2 = string_to_num(kp[1],word_num_map)
 		x2[:len(n2)] = n2
 		x1.extend(x2)
 		xdata.append(x1)
 
 		y  = [0]*max_list[2] 
-		yn = string_to_num(kp[2])
+		yn = string_to_num(kp[2],word_num_map)
 		y[:len(yn)] = yn
 		ydata.append(y)
 
-		break
+		# break
 	return np.array(xdata),np.array(ydata)
 
 	
@@ -150,6 +152,35 @@ def print_poem(poem):
 	for line in poem:
 		print(line)
 	print("-"*30 + 'poem' + '-'*30)
+
+
+# 由一个关键词，前文生成一个向量,返回数据列表
+# max_list = [7,23,7]
+def get_xsample(keyword,context,max_list,word_num_map):
+	x1 = [0]*max_list[0]
+	n1 = string_to_num(keyword,word_num_map)
+	x1[:len(n1)] = n1
+	x2 = [0]*max_list[1]
+	n2 = string_to_num(context,word_num_map)
+	x2[:len(n2)] = n2
+	x1.extend(x2)
+	return x1
+
+# 给定一段文章 提取不超过四个关键词
+def get_4keyword(context):
+	ranker = TextRank4Keyword()
+	ranker.analyze(text,window = 2,lower = True)
+	w_list = ranker.get_keywords(num = 20,word_min_len = 1)
+	keyword_list = []
+	i = 0
+	for w in w_list:
+		keyword_list.append(w.word)
+		i = i + 1
+		if i > 4:
+			break
+	return keyword_list
+
+
 
 
 if __name__ == '__main__':
@@ -174,9 +205,9 @@ if __name__ == '__main__':
 	fpx.close()
 	print("keyword_poetrys = ",len(keyword_poetrys))
 	
-	poetrys_vector = poem_to_vector(keyword_poetrys,vocabulary)
-
-	# x_batches,y_batches,words,n_chunk = get_batches(vocabulary,keyword_poetrys,batch_size = 64)
-	# word_num_map = dict(zip(words, range(len(words))))  # {"人":5,""}
-	# voca_size = len(words)
+	xdata,ydata = poem_to_vector(keyword_poetrys,vocabulary)
+	print("xdata = ",xdata.shape)
+	print("ydata = ",ydata.shape)
+	np.save("../data/xdata",xdata)
+	np.save("../data/ydata",ydata)
 

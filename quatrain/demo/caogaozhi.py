@@ -1,13 +1,23 @@
 #!usr/bin/env/python 
 # -*- coding: utf-8 -*-
-
+import numpy as np
 import pickle
 temp = '../data/'
 
-s = [0]*10
-s1 = [2,3,4,5,3]
-s[0:len(s1)] = s1
-print("s = ",s)
+batch_size = 64
+xdata = np.load('../data/xdata.npy')
+ydata = np.load('../data/ydata.npy')
+xshape = xdata.shape
+yshape = ydata.shape
+
+x = list(range(0,xshape[0]-batch_size ,batch_size))
+y = list(range(batch_size,xshape[0],batch_size))
+
+print("x = ",len(x),len(y))
+batch = list(zip(x,y))
+print(batch[0],batch[-1])
+
+
 '''
 s =  '偶寻半开梅,闲倚一竿竹,儿童不知春'
 print("s = ",len(s))

@@ -1,16 +1,10 @@
 #!usr/bin/env/python 
 # -*- coding: utf-8 -*-
 
-# dataset https://pan.baidu.com/s/1o7QlUhO   poetry.txt
-# http://blog.topspeedsnail.com/archives/10542
-# sudo python3 -m pip install tensorflow==0.12.0
-# http://blog.csdn.net/u014365862/article/details/53868544
 import collections
 import numpy as np
  
-#-------------------------------数据预处理---------------------------#
-
- 
+# 数据预处理
 # 诗集 从文件中生成古诗词列表
 def read_data(poetry_file):
     poetrys = []
@@ -34,8 +28,7 @@ def read_data(poetry_file):
 
 
 def get_batches(poetrys,batch_size = 64):
-	# 按诗的字数排序
-	poetrys = sorted(poetrys,key=lambda line: len(line))
+	poetrys = sorted(poetrys,key=lambda line: len(line)) # 按诗的字数排序
 	print('Number of Quatrain : ', len(poetrys))
 	
 	# 统计每个字出现次数
@@ -54,9 +47,6 @@ def get_batches(poetrys,batch_size = 64):
 	# 把诗转换为向量形式，参考TensorFlow练习1
 	to_num = lambda word: word_num_map.get(word, len(words))
 	poetrys_vector = [ list(map(to_num, poetry)) for poetry in poetrys]
-	#[[314, 3199, 367, 1556, 26, 179, 680, 0, 3199, 41, 506, 40, 151, 4, 98, 1],
-	#[339, 3, 133, 31, 302, 653, 512, 0, 37, 148, 294, 25, 54, 833, 3, 1, 965, 1315, 377, 1700, 562, 21, 37, 0, 2, 1253, 21, 36, 264, 877, 809, 1]
-	#....]
 	
 	# 每次取64首诗进行训练
 	n_chunk = len(poetrys_vector) // batch_size

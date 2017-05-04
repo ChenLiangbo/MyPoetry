@@ -231,3 +231,34 @@ http://qingmang.me/articles/-2609457114363059733
 
 [Keyword Prediction]
 --pointwise mutual information(PMI)：
+
+
+======================================================================================
+[13]Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation
+=======================================================================================
+内容：使用两个RNN来对序列数据进行编码解码处理，一个RNN将序列编码到固定长度的向量，另外一个RNN将向量解码到另一个序列，目的是计算在给定序列条件下另外一个序列发生的条件概率。训练网络最大化此条件概率，训练好的网络有两方面的应用，一是给定序列生成新的序列，另一个是判断两个序列的评分（相似度）
+实验：英语-法语翻译，WMT’14 
+
+[encoder]
+X = (x1; x2; : : : ; xN) 
+Y = (y1; y2; : : : ; yM)
+
+每一个词都是序列，one-hot向量 -在词库上的表示，将词库排列，出现的地方为1，其余地方为0，非常稀疏
+每个序列都嵌入到500维的向量空间
+encoder包括1000个隐含单元
+
+[decoder]
+--直接接在encoder的隐含状态state上，最后使用softmax输出，将结果映射到了一个单词上
+
+例子：
+vocabulary_x = ['i',"am","a","student","teacher","doctor"]
+vocabulary_y = ["是","我","一个","老师","医生","学生",]
+
+word_x = ['student']  -> word_y = ["学生"]
+x = [0,0,0,1,0,0] 
+y = [0,0,0,0,0,1]
+
+[model]
+x -> embedding(512) ->encoder(RNN 1000) -> decoder(RNN 1000) -> softmax(arg max(yt)) 
+
+句子的表示就谁生成的512维的向量在空间上的分布具有某种相关性

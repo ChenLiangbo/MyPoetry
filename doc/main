@@ -37,3 +37,10 @@
 1，制作数据集 训练集  测试集
 2，搭建神经网络
 3，训练 测试
+
+
+[demo]
+----http://blog.topspeedsnail.com/archives/10542
+----sudo python3 -m pip install tensorflow==0.12.0
+----http://blog.csdn.net/u014365862/article/details/53868544
+----dataset https://pan.baidu.com/s/1o7QlUhO   poetry.txt

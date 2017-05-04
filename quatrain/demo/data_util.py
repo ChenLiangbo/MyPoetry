@@ -3,32 +3,63 @@
 
 import collections
 import numpy as np
- 
+from textrank4zh import TextRank4Keyword
+
 # 数据预处理
-# 诗集 从文件中生成古诗词列表
+# 诗集 ['偶寻半开梅,闲倚一竿竹,儿童不知春,问草何故绿','','']
 def read_data(poetry_file):
     poetrys = []
     with open(poetry_file, "r", encoding='utf-8',) as f:
     	for line in f:
     		try:
-    			poem = ['[']
+    			poem = []
     			line = line.strip('\n')
     			line = line.split('\t')
-    			# print("line ---- 1 ",line)
     			poem = poem + line[0].split(' ') + [','] + line[1].split(' ') + ['.'] +  line[2].split(' ') + [','] + line[3].split(' ') + ['.']
-    			poem = poem + [']',]
-    			# print("poem = ",poem,len(poem))
-
 	    		poetrys.append(poem)
 	    	except Exception as ex:
 	    		print("[Exception Information]",str(ex))
 	    		pass
-	    	# break
     return poetrys
 
+# ['梅', '', '偶寻半开梅']
+# ['闲', '偶寻半开梅', '闲倚一竿竹']
+# ['儿童', '偶寻半开梅,闲倚一竿竹', '儿童不知春']
+# ['问草', '偶寻半开梅,闲倚一竿竹,儿童不知春', '问草何故绿']
 
-def get_batches(poetrys,batch_size = 64):
-	poetrys = sorted(poetrys,key=lambda line: len(line)) # 按诗的字数排序
+def keyword_poem(poetry_file):
+    poetrys = []
+    ranker = TextRank4Keyword()
+    j = 0
+    with open(poetry_file, "r", encoding='utf-8',) as f:
+    	for line in f:
+    		line = line.strip('\n')
+    		line = line.replace('\t',',').replace(' ','')
+    		lines = line.split(',')
+    		ranker.analyze(line,window = 2,lower = True)
+    		w_list = ranker.get_keywords(num = 8,word_min_len = 1)
+    		length = len(lines)
+    		for i in range(length):
+    			for w in w_list:
+    				xline = []  # [keyword,context,line]
+    				if w.word in lines[i]:
+    					xline.append(w.word)
+    					xline.append(','.join(lines[0:i]))
+    					xline.append(lines[i])
+    					# print("xline = ",xline)
+    					poetrys.append(xline)
+    					break
+    				# print("xline = ",xline)
+    		j = j + 1
+    		if j % 100 == 0:
+    			print("j = ",j)
+    			break
+
+    		# break
+    return poetrys
+
+def get_batches(origin_poetrys,keyword_poetrys,batch_size = 64):
+	poetrys = sorted(origin_poetrys,key=lambda line: len(line)) # 按诗的字数排序
 	print('Number of Quatrain : ', len(poetrys))
 	
 	# 统计每个字出现次数
@@ -38,6 +69,7 @@ def get_batches(poetrys,batch_size = 64):
 	counter = collections.Counter(all_words)
 	count_pairs = sorted(counter.items(), key=lambda x: -x[1])
 	words, _ = zip(*count_pairs)
+	print("words = ",len(words))
 	 
 	# 取前多少个常用字
 	words = words[:len(words)] + (' ',)
@@ -70,8 +102,8 @@ def get_batches(poetrys,batch_size = 64):
 		"""
 		x_batches.append(xdata)
 		y_batches.append(ydata)
-		# if i > 2000:
-			# break
+		if i > 200:
+			break
 	# print("xdata = ",xdata,type(xdata))
 	# print("-"*80)
 	# print("ydata = ",ydata,type(ydata))
@@ -95,12 +127,25 @@ def print_poem(poem):
 		print(line)
 	print("-"*30 + 'poem' + '-'*30)
 
+
 if __name__ == '__main__':
+	import pickle
 	dataset = '../dataset/'
+	temp = '../data/'
 	poetry_file = dataset + 'qtrain'
-	poetrys = read_data(poetry_file)
-	x_batches,y_batches,words,n_chunk = get_batches(poetrys,batch_size = 64)
-	print("y_batches = ",len(y_batches))
-	print("x_batches = ",len(x_batches))
-	print("words = ",len(words))
-	print("n_chunk = ",n_chunk)
+	origin_poetrys = read_data(poetry_file)
+
+	keyword_poetrys = keyword_poem(poetry_file)
+	fpx = open(temp + 'keyword_poetrys.pkl','wb')
+	pickle.dump(keyword_poetrys,fpx)
+	fpx.close()
+	'''
+	fpx = open(temp + 'keyword_poetrys.pkl','rb')
+	keyword_poetrys = pickle.load(fpx)
+	fpx.close()
+	print("keyword_poetrys = ",len(keyword_poetrys))
+
+	x_batches,y_batches,words,n_chunk = get_batches(origin_poetrys,keyword_poetrys,batch_size = 64)
+	# word_num_map = dict(zip(words, range(len(words))))  # {"人":5,""}
+	# voca_size = len(words)
+	'''

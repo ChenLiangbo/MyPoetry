@@ -1,6 +1,6 @@
 #!usr/bin/env/python 
 # -*- coding: utf-8 -*-
-
+import numpy as np
 import collections
 import numpy as np
 from textrank4zh import TextRank4Keyword
@@ -58,57 +58,81 @@ def keyword_poem(poetry_file):
     		# break
     return poetrys
 
-def get_batches(origin_poetrys,keyword_poetrys,batch_size = 64):
+# 数据集的一些诗句含有不确定汉字'R','俯观<R><R>总尘劳'
+def polish_poem(keyword_poetrys):
+	poetrys = []
+	for kp in keyword_poetrys:
+		if ('R' not in kp[0]) and ('R' not in kp[1]) and ('R' not in kp[2]):
+			poetrys.append(kp)
+	return poetrys
+
+def get_vocabulary(origin_poetrys):
 	poetrys = sorted(origin_poetrys,key=lambda line: len(line)) # 按诗的字数排序
-	print('Number of Quatrain : ', len(poetrys))
-	
 	# 统计每个字出现次数
 	all_words = []
 	for poetry in poetrys:
 		all_words += [word for word in poetry]
+
 	counter = collections.Counter(all_words)
-	count_pairs = sorted(counter.items(), key=lambda x: -x[1])
-	words, _ = zip(*count_pairs)
-	print("words = ",len(words))
-	 
-	# 取前多少个常用字
-	words = words[:len(words)] + (' ',)
-	
-	# 每个字映射为一个数字ID
-	word_num_map = dict(zip(words, range(len(words))))
-	# 把诗转换为向量形式，参考TensorFlow练习1
-	to_num = lambda word: word_num_map.get(word, len(words))
-	poetrys_vector = [ list(map(to_num, poetry)) for poetry in poetrys]
-	
-	# 每次取64首诗进行训练
-	n_chunk = len(poetrys_vector) // batch_size
-	x_batches = []
-	y_batches = []
-	for i in range(n_chunk):
-		start_index = i * batch_size
-		end_index = start_index + batch_size
-	 
-		batches = poetrys_vector[start_index:end_index]
-		length = max(map(len,batches))
-		xdata = np.full((batch_size,length), word_num_map[' '], np.int32)
-		for row in range(batch_size):
-			xdata[row,:len(batches[row])] = batches[row]
-		ydata = np.copy(xdata)
-		ydata[:,:-1] = xdata[:,1:]
-		"""
-		xdata             ydata
-		[6,2,4,6,9]       [2,4,6,9,9]
-		[1,4,2,8,5]       [4,2,8,5,5]
-		"""
-		x_batches.append(xdata)
-		y_batches.append(ydata)
-		if i > 200:
-			break
-	# print("xdata = ",xdata,type(xdata))
-	# print("-"*80)
-	# print("ydata = ",ydata,type(ydata))
-	# print('='*80)
-	return x_batches,y_batches,words,n_chunk
+	count_pairs = sorted(counter.items(), key=lambda x: -x[1])  # 根据出现次数的多少进行排序
+	words, number = zip(*count_pairs)
+	# print("words = ",len(words),words[0:10])  # ('.', ',', '不', '人')
+
+	vocabulary = ('',) + words[:len(words)]
+	word_num_map = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
+	return vocabulary,word_num_map
+
+
+def max_keyword(keyword_poetrys):
+	max_list = [0,0,0]
+	for kp in keyword_poetrys:
+		if len(kp[0]) > max_list[0]:
+			max_list[0] = len(kp[0])
+		if len(kp[1]) > max_list[1]:
+			max_list[1] = len(kp[1])
+		if len(kp[2]) > max_list[2]:
+			max_list[2] = len(kp[2])
+			print("kp2 = ",kp)
+	return max_list
+
+
+def string_to_num(aline,word_num_map):
+	if len(aline) == 0:
+		return [0,]
+	ret = []
+	for s in aline:
+		ret.append(word_num_map[s])
+	return ret
+
+# keyword_max = 7,23,7
+# x[0:7]  = keyword
+# x[7:23] = previous context
+# y[0:7]  = line
+
+def poem_to_vector(keyword_poetrys,vocabulary):
+	keyword_max = max_keyword(keyword_poetrys)
+	word_num_map = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
+	xdata = []
+	ydata = []
+	for kp in keyword_poetrys:
+		print("kp = ",kp)
+		x1 = [0]*max_list[0]
+		n1 = string_to_num(kp[0])
+		x1[:len(n1)] = n1
+		x2 = [0]*max_list[1]
+		n2 = string_to_num(kp[1])
+		x2[:len(n2)] = n2
+		x1.extend(x2)
+		xdata.append(x1)
+
+		y  = [0]*max_list[2] 
+		yn = string_to_num(kp[2])
+		y[:len(yn)] = yn
+		ydata.append(y)
+
+		break
+	return np.array(xdata),np.array(ydata)
+
 	
 def to_poem(ddata,words):
 	shape = ddata.shape
@@ -134,18 +158,25 @@ if __name__ == '__main__':
 	temp = '../data/'
 	poetry_file = dataset + 'qtrain'
 	origin_poetrys = read_data(poetry_file)
+	vocabulary,word_num_map = get_vocabulary(origin_poetrys)
+	print("vocabulary = ",len(vocabulary),type(vocabulary))
 
+	'''
 	keyword_poetrys = keyword_poem(poetry_file)
+	keyword_poetrys = polish_poem(keyword_poetrys)
 	fpx = open(temp + 'keyword_poetrys.pkl','wb')
 	pickle.dump(keyword_poetrys,fpx)
 	fpx.close()
 	'''
 	fpx = open(temp + 'keyword_poetrys.pkl','rb')
 	keyword_poetrys = pickle.load(fpx)
+	keyword_poetrys = polish_poem(keyword_poetrys)
 	fpx.close()
 	print("keyword_poetrys = ",len(keyword_poetrys))
+	
+	poetrys_vector = poem_to_vector(keyword_poetrys,vocabulary)
 
-	x_batches,y_batches,words,n_chunk = get_batches(origin_poetrys,keyword_poetrys,batch_size = 64)
+	# x_batches,y_batches,words,n_chunk = get_batches(vocabulary,keyword_poetrys,batch_size = 64)
 	# word_num_map = dict(zip(words, range(len(words))))  # {"人":5,""}
 	# voca_size = len(words)
-	'''
+

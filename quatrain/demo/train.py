@@ -49,14 +49,15 @@ xvocab_size = len(vocabulary)
 yvocab_size = xvocab_size
 emb_dim = 1024
 
-model = MyModel.Seq2Seq(xseq_len=xseq_len,
-                               yseq_len=yseq_len,
-                               xvocab_size=xvocab_size,
-                               yvocab_size=yvocab_size,
-                               ckpt_path=ckpt,
-                               emb_dim=emb_dim,
-                               num_layers=3
-                               )
+model = MyModel.Seq2Seq(xseq_len    = xseq_len,
+                        yseq_len    = yseq_len,
+                        xvocab_size = xvocab_size,
+                        yvocab_size = yvocab_size,
+                        ckpt_path   = ckpt,
+                        emb_dim     = emb_dim,
+                        num_layers  = 3
+                         )
+
 val_batch_gen = data_util.rand_batch_gen(validX, validY, 32)
 train_batch_gen = data_util.rand_batch_gen(trainX, trainY, batch_size)
 

@@ -9,17 +9,17 @@ from textrank4zh import TextRank4Keyword
 # 诗集 ['偶寻半开梅,闲倚一竿竹,儿童不知春,问草何故绿','','']
 def read_data(poetry_file):
     poetrys = []
+    vocabulary = ''
     with open(poetry_file, "r", encoding='utf-8',) as f:
     	for line in f:
     		try:
-    			poem = []
     			line = line.strip('\n')
-    			line = line.split('\t')
-    			poem = poem + line[0].split(' ') + [','] + line[1].split(' ') + ['.'] +  line[2].split(' ') + [','] + line[3].split(' ') + ['.']
-	    		poetrys.append(poem)
+    			# print("line = ",line)
+    			# break	
+	    		poetrys.append(line)
 	    	except Exception as ex:
 	    		print("[Exception Information]",str(ex))
-	    		pass
+
     return poetrys
 
 # 由一首诗 使用TextRank算法提取关键词，生成 [关键词，前文，当前行]组成的数据
@@ -27,7 +27,6 @@ def read_data(poetry_file):
 # ['闲', '偶寻半开梅', '闲倚一竿竹']
 # ['儿童', '偶寻半开梅,闲倚一竿竹', '儿童不知春']
 # ['问草', '偶寻半开梅,闲倚一竿竹,儿童不知春', '问草何故绿']
-
 def keyword_poem(poetry_file):
     poetrys = []
     ranker = TextRank4Keyword()
@@ -35,28 +34,65 @@ def keyword_poem(poetry_file):
     with open(poetry_file, "r", encoding='utf-8',) as f:
     	for line in f:
     		line = line.strip('\n')
-    		line = line.replace('\t',',').replace(' ','')
+    		# print("line = ",line)
     		lines = line.split(',')
+    		print("lines = ",lines)
     		ranker.analyze(line,window = 2,lower = True)
     		w_list = ranker.get_keywords(num = 8,word_min_len = 1)
     		length = len(lines)
     		for i in range(length):
+    			xline = []  # [keyword,context,line]
     			for w in w_list:
-    				xline = []  # [keyword,context,line]
+    				# print("w = ",w.word)
+    				if len(w.word) > 3:
+    					continue
     				if w.word in lines[i]:
     					xline.append(w.word)
     					xline.append(','.join(lines[0:i]))
     					xline.append(lines[i])
-    					# print("xline = ",xline)
+    					print("xline = ",xline)
     					poetrys.append(xline)
     					break
-    				# print("xline = ",xline)
     		j = j + 1
     		if j % 100 == 0:
     			print("j = ",j)
     			# break
     		# break
+    print("poetrys = ",poetrys)
     return poetrys
+
+# ['负才', '道蕴谈锋不落诠,耳根何福受清圆,自知语乏烟霞气', '枉负才名三十年']
+# use textRank get keyword for every line
+def keyword_line(poetry_file):
+    poetrys = []
+    ranker = TextRank4Keyword()
+    j = 0
+    with open(poetry_file, "r", encoding='utf-8',) as f:
+    	for line in f:
+    		line = line.strip('\n')  # a line is a poem
+    		# print("line = ",line)
+    		lines = line.split(',')
+    		for i in range(len(lines)):
+    			xline = []
+    			ranker.analyze(lines[i],window = 2,lower = True)
+    			w_list = ranker.get_keywords(num = 3,word_min_len = 1)
+    			for w in w_list:
+    				if len(w.word) <= 3:
+    					xline.append(w.word)
+    					xline.append(','.join(lines[:i]))
+    					xline.append(lines[i])
+    					poetrys.append(xline)
+    					# print("xline = ",xline)
+    					break
+
+    		j = j + 1
+    		if j % 100 == 0:
+    			print("j = ",j)
+    			# break
+    		# break
+    # print("poetrys = ",poetrys)
+    return poetrys
+
 
 # 数据集的一些诗句含有不确定汉字'R','俯观<R><R>总尘劳'
 def polish_poem(keyword_poetrys):
@@ -80,6 +116,7 @@ def get_vocabulary(origin_poetrys):
 	# print("words = ",len(words),words[0:10])  # ('.', ',', '不', '人')
 
 	vocabulary = ('',) + words[:len(words)]
+	# vocabulary = words
 	word_num_map = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
 	return vocabulary,word_num_map
 
@@ -135,7 +172,33 @@ def poem_to_vector(keyword_poetrys,vocabulary):
 		# break
 	return np.array(xdata),np.array(ydata)
 
-	
+# x = (None,30)
+# y = (None,7,voca_size)
+def one_hot_vectorize(keyword_poetrys,vocabulary):
+	max_list = max_keyword(keyword_poetrys)
+	word_num_map = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
+	# num_word_map = dict(zip(range(len(vocabulary)),vocabulary))
+	voca_zie = len(vocabulary)
+	x = []
+	y = []
+	length = len(keyword_poetrys[0][-1])
+	print("length = ",length)
+	for kp in keyword_poetrys:
+		x1 = [0]*max_list[0]
+		n1 = string_to_num(kp[0],word_num_map)
+		x1[:len(n1)] = n1
+		x2 = [0]*max_list[1]
+		n2 = string_to_num(kp[1],word_num_map)
+		x2[:len(n2)] = n2
+		x1.extend(x2)
+		y1 = np.zeros((length,voca_zie))
+		for i in range(length):
+			word = kp[2][i]
+			index = word_num_map[word]
+			y1[i:index] = 1
+		y.append(y1)
+	return np.array(x),np.array(y)
+
 def to_poem(ddata,words):
 	shape = ddata.shape
 	# print("shape = ",shape)
@@ -185,29 +248,28 @@ def get_4keyword(context):
 
 if __name__ == '__main__':
 	import pickle
-	dataset = '../dataset/'
+	dataset = '../newdata/'
 	temp = '../data/'
 	poetry_file = dataset + 'qtrain'
-	origin_poetrys = read_data(poetry_file)
-	vocabulary,word_num_map = get_vocabulary(origin_poetrys)
-	print("vocabulary = ",len(vocabulary),type(vocabulary))
+	# origin_poetrys = read_data(poetry_file)
+	# vocabulary,word_num_map = get_vocabulary(origin_poetrys)
+	# print("vocabulary = ",len(vocabulary),vocabulary[0:10])
 
-	'''
 	keyword_poetrys = keyword_poem(poetry_file)
-	keyword_poetrys = polish_poem(keyword_poetrys)
-	fpx = open(temp + 'keyword_poetrys.pkl','wb')
-	pickle.dump(keyword_poetrys,fpx)
-	fpx.close()
-	'''
-	fpx = open(temp + 'keyword_poetrys.pkl','rb')
-	keyword_poetrys = pickle.load(fpx)
-	keyword_poetrys = polish_poem(keyword_poetrys)
-	fpx.close()
-	print("keyword_poetrys = ",len(keyword_poetrys))
+	# keyword_poetrys = polish_poem(keyword_poetrys)
+	# fpx = open(temp + 'keyword_poetrys.pkl','wb')
+	# pickle.dump(keyword_poetrys,fpx)
+	# fpx.close()
+
+	# fpx = open(temp + 'keyword_poetrys.pkl','rb')
+	# keyword_poetrys = pickle.load(fpx)
+	# keyword_poetrys = polish_poem(keyword_poetrys)
+	# fpx.close()
+	# print("keyword_poetrys = ",len(keyword_poetrys))
 	
-	xdata,ydata = poem_to_vector(keyword_poetrys,vocabulary)
-	print("xdata = ",xdata.shape)
-	print("ydata = ",ydata.shape)
-	np.save("../data/xdata",xdata)
-	np.save("../data/ydata",ydata)
+	# xdata,ydata = poem_to_vector(keyword_poetrys,vocabulary)
+	# print("xdata = ",xdata.shape)
+	# print("ydata = ",ydata.shape)
+	# np.save("../data/xdata",xdata)
+	# np.save("../data/ydata",ydata)
 

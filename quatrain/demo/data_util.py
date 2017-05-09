@@ -117,8 +117,7 @@ def get_vocabulary(origin_poetrys):
 
 	vocabulary = ('',) + words[:len(words)]
 	# vocabulary = words
-	word_num_map = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
-	return vocabulary,word_num_map
+	return vocabulary
 
 # get max length of poem,[keyword,pre-context,line]
 # 确定每个部分的最大长度，关键词，前文，当前行
@@ -164,7 +163,7 @@ def poem_to_vector(keyword_poetrys,vocabulary):
 		x1.extend(x2)
 		xdata.append(x1)
 
-		y  = [0]*max_list[2] 
+		y  = [0]*(max_list[0] + max_list[1])  # x y same length 
 		yn = string_to_num(kp[2],word_num_map)
 		y[:len(yn)] = yn
 		ydata.append(y)
@@ -199,16 +198,6 @@ def one_hot_vectorize(keyword_poetrys,vocabulary):
 		y.append(y1)
 	return np.array(x),np.array(y)
 
-def to_poem(ddata,words):
-	shape = ddata.shape
-	# print("shape = ",shape)
-	poem = []
-	for i in range(shape[0]):
-		line = []
-		for j in range(shape[1]):
-			line.append(words[ddata[i,j]])
-		poem.append(line)
-	return poem
 
 def print_poem(poem):
 	print("-"*30 + 'poem' + '-'*30)
@@ -251,25 +240,33 @@ if __name__ == '__main__':
 	dataset = '../newdata/'
 	temp = '../data/'
 	poetry_file = dataset + 'qtrain'
-	# origin_poetrys = read_data(poetry_file)
-	# vocabulary,word_num_map = get_vocabulary(origin_poetrys)
-	# print("vocabulary = ",len(vocabulary),vocabulary[0:10])
+	origin_poetrys = data_util.read_data(poetry_file)
+	vocabulary,word_num_map = data_util.get_vocabulary(origin_poetrys)
+	print("vocabulary = ",len(vocabulary),vocabulary[0:10])
 
-	keyword_poetrys = keyword_poem(poetry_file)
+	# keyword_poetrys = keyword_poem(poetry_file)
 	# keyword_poetrys = polish_poem(keyword_poetrys)
+	# keyword_poetrys = data_util.keyword_line(poetry_file)
 	# fpx = open(temp + 'keyword_poetrys.pkl','wb')
 	# pickle.dump(keyword_poetrys,fpx)
 	# fpx.close()
 
-	# fpx = open(temp + 'keyword_poetrys.pkl','rb')
-	# keyword_poetrys = pickle.load(fpx)
+	fpx = open(temp + 'keyword_poetrys.pkl','rb')
+	keyword_poetrys = pickle.load(fpx)
 	# keyword_poetrys = polish_poem(keyword_poetrys)
-	# fpx.close()
-	# print("keyword_poetrys = ",len(keyword_poetrys))
+	fpx.close()
+	print("keyword_poetrys = ",len(keyword_poetrys))
 	
-	# xdata,ydata = poem_to_vector(keyword_poetrys,vocabulary)
-	# print("xdata = ",xdata.shape)
-	# print("ydata = ",ydata.shape)
-	# np.save("../data/xdata",xdata)
-	# np.save("../data/ydata",ydata)
+	xdata,ydata = poem_to_vector(keyword_poetrys,vocabulary)
+	print("xdata = ",xdata.shape)
+	print("ydata = ",ydata.shape)
+	np.save("../data/xdata",xdata)
+	np.save("../data/ydata",ydata)
+
+	# one_hot_x,one_hot_y = data_util.one_hot_vectorize(keyword_poetrys,vocabulary)
+	# print("one_hot_x = ",one_hot_x.shape)
+	# print("one_hot_y = ",one_hot_y.shape)
+	# np.save("../data/one_hot_x",one_hot_x)
+	# np.save("../data/one_hot_y",one_hot_y)
+
 

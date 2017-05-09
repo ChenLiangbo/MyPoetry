@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 import os
 
+target = '../newdata/quatrain7'
+
 def delete_5words(filename,outdir):
 	out = filename.split('/')[-1]
 	fp = open(filename, "r", encoding='utf-8',)
-	writer = open(outdir + out,'w',encoding='utf-8')
+	writer = open(target,'a',encoding='utf-8')
 	for line in fp:
 		line = line.strip('\n').replace(' ','').replace('\t',',')
 		if len(line.split(',')[0]) > 5  and 'R' not in line :

@@ -3,10 +3,10 @@
 import numpy as np
 import MyModel
 import data_util
-
+import pickle
 
 data = '../data/'
-temp = '../ckpt/'
+ckpt = '../ckpt/'
 
 xdata = np.load(data + 'xdata.npy')
 ydata = np.load(data + 'ydata.npy')
@@ -32,8 +32,11 @@ print("train = ",trainX.shape,"validate = ",validX.shape,"test = ",testX.shape)
 
 dataset = '../newdata/'
 poetry_file = dataset + 'quatrain7'
-origin_poetrys = data_util.read_data(poetry_file)
-vocabulary = data_util.get_vocabulary(origin_poetrys)
+fpx = open(data + 'keyword_poetrys.pkl','rb')
+keyword_poetrys = pickle.load(fpx)
+fpx.close()
+vocabulary = data_util.get_vocabulary(keyword_poetrys)
+
 word_num_map = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
 num_word_map = dict(zip(range(len(vocabulary)),vocabulary))
 
@@ -54,8 +57,8 @@ model = MyModel.Seq2Seq(xseq_len=xseq_len,
                                emb_dim=emb_dim,
                                num_layers=3
                                )
-val_batch_gen = data_utils.rand_batch_gen(validX, validY, 32)
-train_batch_gen = data_utils.rand_batch_gen(trainX, trainY, batch_size)
+val_batch_gen = data_util.rand_batch_gen(validX, validY, 32)
+train_batch_gen = data_util.rand_batch_gen(trainX, trainY, batch_size)
 
 
 sess = model.train(train_batch_gen, val_batch_gen)

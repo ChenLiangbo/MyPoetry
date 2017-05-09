@@ -4,6 +4,7 @@ import numpy as np
 import collections
 import numpy as np
 from textrank4zh import TextRank4Keyword
+import random 
 
 # 由一首诗 使用TextRank算法提取关键词，生成 [关键词，前文，当前行]组成的数据
 # ['梅', '', '偶寻半开梅']
@@ -92,7 +93,7 @@ def get_vocabulary(keyword_poetrys):
 	count_pairs = sorted(counter.items(), key=lambda x: -x[1])  # 根据出现次数的多少进行排序
 	words, number = zip(*count_pairs)
 	
-	vocabulary = ('',) + words[:len(words)]
+	vocabulary = (' ',) + words[:len(words)]
 	# vocabulary = words
 	return vocabulary
 
@@ -119,7 +120,13 @@ def string_to_num(aline,word_num_map):
 		return [0,]
 	ret = []
 	for s in aline:
-		ret.append(word_num_map[s])
+		try:
+			num = word_num_map[s]
+		except Exception as ex:
+			print("[Exception Information]",str(ex))
+			num = 0
+
+		ret.append(num)
 	return ret
 
 # keyword_max = 7,23,7
@@ -225,6 +232,20 @@ def num_to_poem(seq_y,vocabulary):
 	return poem
 
 
+def rand_batch_gen(x, y, batch_size):
+    while True:
+        sample_idx = random.sample(list(np.arange(len(x))), batch_size)
+        yield x[sample_idx].T, y[sample_idx].T
+
+
+def batch_gen(x, y, batch_size):
+    # infinite while
+    while True:
+        for i in range(0, len(x), batch_size):
+            if (i+1)*batch_size < len(x):
+                yield x[i : (i+1)*batch_size ].T, y[i : (i+1)*batch_size ].T
+
+
 if __name__ == '__main__':
 	import pickle
 	dataset = '../newdata/'
@@ -232,17 +253,17 @@ if __name__ == '__main__':
 	poetry_file = dataset + 'quatrain7'
 
 	# keyword_poetrys = keyword_poem(poetry_file) # get keyword from whole poem
-	keyword_poetrys = keyword_line(poetry_file) # get keyword line by line
+	# keyword_poetrys = keyword_line(poetry_file) # get keyword line by line
 
 
-	fpx = open(temp + 'keyword_poetrys.pkl','wb')
-	pickle.dump(keyword_poetrys,fpx)
-	fpx.close()
-
-	# fpx = open(temp + 'keyword_poetrys.pkl','rb')
-	# keyword_poetrys = pickle.load(fpx)
-	# # keyword_poetrys = polish_poem(keyword_poetrys)
+	# fpx = open(temp + 'keyword_poetrys.pkl','wb')
+	# pickle.dump(keyword_poetrys,fpx)
 	# fpx.close()
+
+	fpx = open(temp + 'keyword_poetrys.pkl','rb')
+	keyword_poetrys = pickle.load(fpx)
+	# keyword_poetrys = polish_poem(keyword_poetrys)
+	fpx.close()
 	print("keyword_poetrys = ",len(keyword_poetrys))
 	# print("keyword_poetrys = ",keyword_poetrys[0:3])
 

@@ -93,10 +93,12 @@ class Seq2Seq(object):
             # train op to minimize the loss
             self.train_op = tf.train.AdamOptimizer(learning_rate=lr).minimize(self.loss)
 
-        sys.stdout.write('<log> Building Graph ')
+        # sys.stdout.write('<log> Building Graph ')
+        print("Building Graph successfully!")
         # build comput graph
         __graph__()
-        sys.stdout.write('</log>')
+        # sys.stdout.write('</log>')
+        
 
 
 
@@ -156,7 +158,8 @@ class Seq2Seq(object):
             # init all variables
             sess.run(tf.global_variables_initializer())
 
-        sys.stdout.write('\n<log> Training started </log>\n')
+        # sys.stdout.write('\n<log> Training started </log>\n')
+        print("Training started ...")
         # run M epochs
         for i in range(self.epochs):
             try:
@@ -169,7 +172,7 @@ class Seq2Seq(object):
                     # print stats
                     print('\nModel saved to disk at iteration #{}'.format(i))
                     print('val   loss : {0:.6f}'.format(val_loss))
-                    sys.stdout.flush()
+                    # sys.stdout.flush()
             except KeyboardInterrupt: # this will most definitely happen, so handle it
                 print('Interrupted by user at iteration {}'.format(i))
                 self.session = sess

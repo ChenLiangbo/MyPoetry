@@ -8,8 +8,8 @@ import pickle
 data = '../data/'
 ckpt = '../ckpt/'
 
-xdata = np.load(data + 'xdata.npy')
-ydata = np.load(data + 'ydata.npy')
+xdata = np.load(data + 'xdata1.npy')
+ydata = np.load(data + 'ydata1.npy')
 print("xdata = ",xdata.shape)  # (246152, 26)
 print("ydata = ",ydata.shape)  # (246152, 26)
 print(xdata[10])

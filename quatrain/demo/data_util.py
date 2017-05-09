@@ -151,8 +151,8 @@ def poem_to_vector(keyword_poetrys,vocabulary):
 		x1.extend(x2)
 		xdata.append(x1)
 
-		y  = [0]*(max_list[0] + max_list[1])  # x y same length 
-		# y  = [0]*max_list[2]  # x y different length
+		# y  = [0]*(max_list[0] + max_list[1])  # x y same length 
+		y  = [0]*max_list[2]  # x y different length
 		yn = string_to_num(kp[2],word_num_map)
 		y[:len(yn)] = yn
 		ydata.append(y)
@@ -273,8 +273,8 @@ if __name__ == '__main__':
 	xdata,ydata = poem_to_vector(keyword_poetrys,vocabulary)
 	print("xdata = ",xdata.shape)
 	print("ydata = ",ydata.shape)
-	np.save("../data/xdata",xdata)
-	np.save("../data/ydata",ydata)
+	np.save("../data/xdata1",xdata)
+	np.save("../data/ydata1",ydata)
 
 	# one_hot_x,one_hot_y = data_util.one_hot_vectorize(keyword_poetrys,vocabulary)
 	# print("one_hot_x = ",one_hot_x.shape)

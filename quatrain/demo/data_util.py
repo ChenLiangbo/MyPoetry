@@ -5,23 +5,6 @@ import collections
 import numpy as np
 from textrank4zh import TextRank4Keyword
 
-# 读取诗歌数据，生成以一首诗为元素的列表
-# 诗集 ['偶寻半开梅,闲倚一竿竹,儿童不知春,问草何故绿','','']
-def read_data(poetry_file):
-    poetrys = []
-    vocabulary = ''
-    with open(poetry_file, "r", encoding='utf-8',) as f:
-    	for line in f:
-    		try:
-    			line = line.strip('\n')
-    			# print("line = ",line)
-    			# break	
-	    		poetrys.append(line)
-	    	except Exception as ex:
-	    		print("[Exception Information]",str(ex))
-
-    return poetrys
-
 # 由一首诗 使用TextRank算法提取关键词，生成 [关键词，前文，当前行]组成的数据
 # ['梅', '', '偶寻半开梅']
 # ['闲', '偶寻半开梅', '闲倚一竿竹']
@@ -36,7 +19,7 @@ def keyword_poem(poetry_file):
     		line = line.strip('\n')
     		# print("line = ",line)
     		lines = line.split(',')
-    		print("lines = ",lines)
+    		# print("lines = ",lines)
     		ranker.analyze(line,window = 2,lower = True)
     		w_list = ranker.get_keywords(num = 8,word_min_len = 1)
     		length = len(lines)
@@ -50,7 +33,7 @@ def keyword_poem(poetry_file):
     					xline.append(w.word)
     					xline.append(','.join(lines[0:i]))
     					xline.append(lines[i])
-    					print("xline = ",xline)
+    					# print("xline = ",xline)
     					poetrys.append(xline)
     					break
     		j = j + 1
@@ -58,7 +41,7 @@ def keyword_poem(poetry_file):
     			print("j = ",j)
     			# break
     		# break
-    print("poetrys = ",poetrys)
+    # print("poetrys = ",poetrys)
     return poetrys
 
 # ['负才', '道蕴谈锋不落诠,耳根何福受清圆,自知语乏烟霞气', '枉负才名三十年']
@@ -86,35 +69,29 @@ def keyword_line(poetry_file):
     					break
 
     		j = j + 1
-    		if j % 100 == 0:
+    		if j % 200 == 0:
     			print("j = ",j)
-    			# break
+    			break
     		# break
     # print("poetrys = ",poetrys)
     return poetrys
 
 
-# 数据集的一些诗句含有不确定汉字'R','俯观<R><R>总尘劳'
-def polish_poem(keyword_poetrys):
-	poetrys = []
-	for kp in keyword_poetrys:
-		if ('R' not in kp[0]) and ('R' not in kp[1]) and ('R' not in kp[2]):
-			poetrys.append(kp)
-	return poetrys
-
 # 根据原始的诗词生成词库，将词库按照词出现的频率排列，频率大的靠前
-def get_vocabulary(origin_poetrys):
-	poetrys = sorted(origin_poetrys,key=lambda line: len(line)) # 按诗的字数排序
+# [keyword,context,line]
+def get_vocabulary(keyword_poetrys):
+	poetrys = []
+	for i in range(len(keyword_poetrys)):
+		poetrys.append(keyword_poetrys[i][2])
+	# print("poetrys = ",poetrys[1])
+
 	# 统计每个字出现次数
-	all_words = []
-	for poetry in poetrys:
-		all_words += [word for word in poetry]
+	all_words = ','.join(poetrys)
 
 	counter = collections.Counter(all_words)
 	count_pairs = sorted(counter.items(), key=lambda x: -x[1])  # 根据出现次数的多少进行排序
 	words, number = zip(*count_pairs)
-	# print("words = ",len(words),words[0:10])  # ('.', ',', '不', '人')
-
+	
 	vocabulary = ('',) + words[:len(words)]
 	# vocabulary = words
 	return vocabulary
@@ -122,6 +99,8 @@ def get_vocabulary(origin_poetrys):
 # get max length of poem,[keyword,pre-context,line]
 # 确定每个部分的最大长度，关键词，前文，当前行
 def max_keyword(keyword_poetrys):
+	# print('+'*80)
+	# print(keyword_poetrys[0])
 	max_list = [0,0,0]
 	for kp in keyword_poetrys:
 		if len(kp[0]) > max_list[0]:
@@ -131,6 +110,7 @@ def max_keyword(keyword_poetrys):
 		if len(kp[2]) > max_list[2]:
 			max_list[2] = len(kp[2])
 			# print("kp2 = ",kp)
+	# print('+'*80)
 	return max_list
 
 # a string line poem to number list
@@ -149,6 +129,7 @@ def string_to_num(aline,word_num_map):
 
 def poem_to_vector(keyword_poetrys,vocabulary):
 	max_list = max_keyword(keyword_poetrys)
+	print("max_list = ",max_list)
 	word_num_map = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
 	xdata = []
 	ydata = []
@@ -164,6 +145,7 @@ def poem_to_vector(keyword_poetrys,vocabulary):
 		xdata.append(x1)
 
 		y  = [0]*(max_list[0] + max_list[1])  # x y same length 
+		# y  = [0]*max_list[2]  # x y different length
 		yn = string_to_num(kp[2],word_num_map)
 		y[:len(yn)] = yn
 		ydata.append(y)
@@ -233,30 +215,40 @@ def get_4keyword(context):
 	return keyword_list
 
 
+# transform a digit to poem 
+def num_to_poem(seq_y,vocabulary):
+	num_word_map = dict(zip(range(len(vocabulary)),vocabulary))
+	poem = []
+	seq_y = seq_y.tolist()
+	for y in seq_y[0:7]:
+		poem.append(num_word_map[y])
+	return poem
 
 
 if __name__ == '__main__':
 	import pickle
 	dataset = '../newdata/'
 	temp = '../data/'
-	poetry_file = dataset + 'qtrain'
-	origin_poetrys = data_util.read_data(poetry_file)
-	vocabulary,word_num_map = data_util.get_vocabulary(origin_poetrys)
-	print("vocabulary = ",len(vocabulary),vocabulary[0:10])
+	poetry_file = dataset + 'quatrain7'
 
-	# keyword_poetrys = keyword_poem(poetry_file)
-	# keyword_poetrys = polish_poem(keyword_poetrys)
-	# keyword_poetrys = data_util.keyword_line(poetry_file)
-	# fpx = open(temp + 'keyword_poetrys.pkl','wb')
-	# pickle.dump(keyword_poetrys,fpx)
-	# fpx.close()
+	# keyword_poetrys = keyword_poem(poetry_file) # get keyword from whole poem
+	keyword_poetrys = keyword_line(poetry_file) # get keyword line by line
 
-	fpx = open(temp + 'keyword_poetrys.pkl','rb')
-	keyword_poetrys = pickle.load(fpx)
-	# keyword_poetrys = polish_poem(keyword_poetrys)
+
+	fpx = open(temp + 'keyword_poetrys.pkl','wb')
+	pickle.dump(keyword_poetrys,fpx)
 	fpx.close()
+
+	# fpx = open(temp + 'keyword_poetrys.pkl','rb')
+	# keyword_poetrys = pickle.load(fpx)
+	# # keyword_poetrys = polish_poem(keyword_poetrys)
+	# fpx.close()
 	print("keyword_poetrys = ",len(keyword_poetrys))
-	
+	# print("keyword_poetrys = ",keyword_poetrys[0:3])
+
+	vocabulary = get_vocabulary(keyword_poetrys)
+	print("vocabulary = ",len(vocabulary))
+
 	xdata,ydata = poem_to_vector(keyword_poetrys,vocabulary)
 	print("xdata = ",xdata.shape)
 	print("ydata = ",ydata.shape)

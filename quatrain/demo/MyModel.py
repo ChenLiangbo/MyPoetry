@@ -3,6 +3,10 @@ import numpy as np
 import sys
 import os
 
+# https://github.com/suriyadeepan/practical_seq2seq
+# http://suriyadeepan.github.io/2016-12-31-practical-seq2seq/
+
+
 class Seq2Seq(object):
 
     def __init__(self, xseq_len, yseq_len, 

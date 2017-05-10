@@ -151,12 +151,17 @@ class Seq2Seq(object):
         # we need to save the model periodically
         saver = tf.train.Saver()
 
+
         # if no session is given
         if not sess:
-            # create a session
-            sess = tf.Session()
-            # init all variables
-            sess.run(tf.global_variables_initializer())
+            try:
+                sess = self.restore_last_session()
+            except Exception as ex:
+                print("[Exception Information] ",str(ex))
+                # create a session
+                sess = tf.Session()
+                # init all variables
+        sess.run(tf.global_variables_initializer())
 
         # sys.stdout.write('\n<log> Training started </log>\n')
         print("Training started ...")
@@ -176,6 +181,7 @@ class Seq2Seq(object):
             except KeyboardInterrupt: # this will most definitely happen, so handle it
                 print('Interrupted by user at iteration {}'.format(i))
                 self.session = sess
+                saver.save(sess, self.ckpt_path + self.model_name + '.ckpt', global_step=i)
                 return sess
 
     def restore_last_session(self):
@@ -188,11 +194,25 @@ class Seq2Seq(object):
         if ckpt and ckpt.model_checkpoint_path:
             saver.restore(sess, ckpt.model_checkpoint_path)
         # return to user
+        print("load model okay!")
         return sess
 
     # prediction
     def predict(self, sess, X):
-        feed_dict = {self.enc_ip[t]: X[t] for t in range(self.xseq_len)}
+        feed_dict = {self.enc_ip[t]: X[:,t] for t in range(self.xseq_len)}
+        feed_dict[self.keep_prob] = 1.
+        dec_op_v = sess.run(self.decode_outputs_test, feed_dict)
+        print("dec_op_v = ",len(dec_op_v),len(dec_op_v[0]))
+        # dec_op_v is a list; also need to transpose 0,1 indices 
+        #  (interchange batch_size and timesteps dimensions
+        dec_op_v = np.array(dec_op_v).transpose([1,0,2])
+        print("dec_op_v = ",dec_op_v.shape)
+        # return the index of item with highest probability
+        return np.argmax(dec_op_v, axis=2)
+
+
+    def predict_one(self, sess, x):
+        feed_dict = {self.enc_ip[t]: x[:,t] for t in range(self.xseq_len)}
         feed_dict[self.keep_prob] = 1.
         dec_op_v = sess.run(self.decode_outputs_test, feed_dict)
         # dec_op_v is a list; also need to transpose 0,1 indices 
@@ -200,5 +220,6 @@ class Seq2Seq(object):
         dec_op_v = np.array(dec_op_v).transpose([1,0,2])
         # return the index of item with highest probability
         return np.argmax(dec_op_v, axis=2)
+
 
 

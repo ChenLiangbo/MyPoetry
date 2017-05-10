@@ -272,3 +272,37 @@ x -> embedding(512) ->encoder(RNN 1000) -> decoder(RNN 1000) -> softmax(arg max(
   (1) 序列到序列的语言模型
   (2) 将输入序列逆序可以对长句子有更好的翻译效果
 
+
+==================================================================
+[15]A Neural Conversational Model
+===================================================================
+[Main Idea] 
+----machine conversation,
+----predicting the next sentence given the previous sentence or sentences in a conversation,
+----producing answers given by a probabilistic model trained to maximize the probability of the answer given some contex
+----usage: machine translation, question/answering, and conversations
+
+
+[Advantage]
+----end-to-end and thus requires much fewer hand-crafted rules,the model can give a technicol answer
+----generating fluent and accurate replies to conversations
+
+dataset : IT helpdesk dataset,queries and reponses
+
+[model] ---- seq2seq
+----Input : 'ABC' + 'EOS'
+----Output: 'WXYZ' + 'EOS'
+----Model : 'ABC' -> 'WXYZ'
+
+
+[dataset]
+----One : closed-domain IT helpdesk troubleshooting dataset
+----Two : open-domain movie transcript dataset,OpenSubtitles
+
+[Experiments]
+----IT Helpdesk Troubleshooting experiments
+  LSTM(One layer,1024 units),SGD
+  VOCABULARY : 20K words
+  perplexity : 8 (n-gram:18)
+  remember facts,understand contexts
+  model can generalize to new question

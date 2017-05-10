@@ -72,7 +72,7 @@ def keyword_line(poetry_file):
     		j = j + 1
     		if j % 200 == 0:
     			print("j = ",j)
-    			break
+    			# break
     		# break
     # print("poetrys = ",poetrys)
     return poetrys
@@ -226,7 +226,7 @@ def get_4keyword(context):
 def num_to_poem(seq_y,vocabulary):
 	num_word_map = dict(zip(range(len(vocabulary)),vocabulary))
 	poem = []
-	seq_y = seq_y.tolist()
+	# seq_y = seq_y.tolist()
 	for y in seq_y[0:7]:
 		poem.append(num_word_map[y])
 	return poem
@@ -253,18 +253,18 @@ if __name__ == '__main__':
 	poetry_file = dataset + 'quatrain7'
 
 	# keyword_poetrys = keyword_poem(poetry_file) # get keyword from whole poem
-	# keyword_poetrys = keyword_line(poetry_file) # get keyword line by line
+	keyword_poetrys = keyword_line(poetry_file) # get keyword line by line
 
 
-	# fpx = open(temp + 'keyword_poetrys.pkl','wb')
-	# pickle.dump(keyword_poetrys,fpx)
-	# fpx.close()
-
-	fpx = open(temp + 'keyword_poetrys.pkl','rb')
-	keyword_poetrys = pickle.load(fpx)
-	# keyword_poetrys = polish_poem(keyword_poetrys)
+	fpx = open(temp + 'keyword_poetrys.pkl','wb')
+	pickle.dump(keyword_poetrys,fpx)
 	fpx.close()
-	print("keyword_poetrys = ",len(keyword_poetrys))
+
+	# fpx = open(temp + 'keyword_poetrys.pkl','rb')
+	# keyword_poetrys = pickle.load(fpx)
+	# keyword_poetrys = polish_poem(keyword_poetrys)
+	# fpx.close()
+	# print("keyword_poetrys = ",len(keyword_poetrys))
 	# print("keyword_poetrys = ",keyword_poetrys[0:3])
 
 	vocabulary = get_vocabulary(keyword_poetrys)

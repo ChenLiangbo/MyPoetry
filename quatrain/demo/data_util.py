@@ -250,6 +250,8 @@ def batch_gen(x, y, batch_size):
 
 if __name__ == '__main__':
 	import pickle
+	import time
+	t1 = time.time()
 	dataset = '../newdata/'
 	temp = '../data/'
 	poetry_file = dataset + 'quatrain7'
@@ -283,5 +285,7 @@ if __name__ == '__main__':
 	# print("one_hot_y = ",one_hot_y.shape)
 	# np.save("../data/one_hot_x",one_hot_x)
 	# np.save("../data/one_hot_y",one_hot_y)
+	t2 = time.time()
+	print("It takes %f seconds !" % (t2 - t1))
 
 

@@ -42,6 +42,17 @@
 [demo]
 ----github: practical_seq2seq
 
+[Experiments]
+----
+	Input  : (?,26)  kwyword <= 3, context <= 23
+	Output : (?,7)  or (?,26)  filled with zero
+	model  : Input -> LSTM(3 x 1024) -> Output
+	LSTM   : BasicLSTM
+	decoder: Attention based or just embedding_rnn_seq2seq
+	lr     : 0.0001
+	epoch  : 100000
+	dropout: 0.5
+	loss   : seq2seq.sequence_loss
 
 
 [Train Net]
@@ -54,7 +65,7 @@
 	file   : quatrain/demo/train.py
 	log    : out.log
 	model  : embedding_attention_seq2seq
-	ability:
+	ability: 821.238187  for keyword extract
 
 ----
 	server : 41
@@ -78,6 +89,8 @@
 	model  : embedding_rnn_seq2seq
 	ability: 
 
+
+not started
 ----
 	server : 21
 	time   : 5.10 14:27

@@ -40,9 +40,51 @@
 
 
 [demo]
-----http://blog.topspeedsnail.com/archives/10542
-----sudo python3 -m pip install tensorflow==0.12.0
-----http://blog.csdn.net/u014365862/article/details/53868544
-----dataset https://pan.baidu.com/s/1o7QlUhO   poetry.txt
+----github: practical_seq2seq
 
 
+
+[Train Net]
+----
+	server : 40
+	time   : 5.10 14:27
+	input  : (?,26)
+	output : (?,7)
+	epoch  : 100000
+	file   : quatrain/demo/train.py
+	log    : out.log
+	model  : embedding_attention_seq2seq
+	ability:
+
+----
+	server : 41
+	time   : 5.9 20:13
+	input  : (?,26)
+	output : (?,7)
+	epoch  : 100000
+	file   : quatrain/demo/train.py
+	log    : out.log
+	model  : embedding_rnn_seq2seq
+	ability: 
+
+----
+	server : 42
+	time   : 5.10 14:27
+	input  : (?,26)
+	output : (?,26)
+	epoch  : 100000
+	file   : quatrain/demo/train.py
+	log    : out.log
+	model  : embedding_rnn_seq2seq
+	ability: 
+
+----
+	server : 21
+	time   : 5.10 14:27
+	input  : (?,26)
+	output : (?,7)
+	epoch  : 100000
+	file   : quatrain/demo/train.py
+	log    : out.log
+	model  : embedding_attention_seq2seq
+	ability: 913.69s for keyword extract

@@ -17,7 +17,7 @@ print(ydata[10])
 print("-"*80)
 shape = xdata.shape
 # train validate,test
-dsplit = [0.95,0.02,0.03]
+dsplit = [9.5,0.2,0.3]
 length = int(dsplit[0]*shape[0]/10)
 length1= int(dsplit[1]*shape[0]/10)
 

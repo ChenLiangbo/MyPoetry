@@ -205,7 +205,7 @@ def get_xsample(keyword,context,max_list,word_num_map):
 	n2 = string_to_num(context,word_num_map)
 	x2[:len(n2)] = n2
 	x1.extend(x2)
-	return x1
+	return np.array(x1).reshape((1,len(x1)))
 
 # 给定一段文章 提取不超过四个关键词
 def get_4keyword(context):
@@ -215,6 +215,8 @@ def get_4keyword(context):
 	keyword_list = []
 	i = 0
 	for w in w_list:
+		if len(w.word) > 3:
+			continue
 		keyword_list.append(w.word)
 		i = i + 1
 		if i > 4:

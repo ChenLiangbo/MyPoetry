@@ -49,15 +49,15 @@ xvocab_size = len(vocabulary)
 yvocab_size = xvocab_size
 emb_dim = 1024
 
-model = MyModel.Seq2Seq(xseq_len=xseq_len,
-                               yseq_len=yseq_len,
-                               xvocab_size=xvocab_size,
-                               yvocab_size=yvocab_size,
-                               ckpt_path=ckpt,
-                               emb_dim=emb_dim,
-                               num_layers=3
-                               )
 
+model = MyModel.Seq2Seq(xseq_len    = xseq_len,
+                        yseq_len    = yseq_len,
+                        xvocab_size = xvocab_size,
+                        yvocab_size = yvocab_size,
+                        ckpt_path   = ckpt,
+                        emb_dim     = emb_dim,
+                        num_layers  = 3
+                         )
 sess = model.restore_last_session()
 '''
 predictY = model.predict(sess,testX)
@@ -76,7 +76,7 @@ print('+'*80)
 shape = testX.shape
 for i in range(100):
       x = testX[i,:].reshape((1,shape[1]))
-      y = testY[i,:].reshape((1,7))
+      y = testY[i,:].reshape((1,ydata.shape[1]))
       #print("x = ",x.shape,"y = ",y.shape)
       py= model.predict_one(sess,x)
       #print("py = ",py)

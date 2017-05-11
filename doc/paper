@@ -306,3 +306,31 @@ dataset : IT helpdesk dataset,queries and reponses
   perplexity : 8 (n-gram:18)
   remember facts,understand contexts
   model can generalize to new question
+
+
+======================================================================================
+[16]Iterative Alternating Neural Attention for Machine Reading
+======================================================================================
+思想：使用可替代迭代机制来解决机器阅读理解任务，比如完形填空。完形填空的问题是在一个完整的句子当中删去一些词语生成的，所提出的模型被称为 neural attention-based inference model，模型使用一个RNN将数据读入，然后使用一种迭代机制寻找，document，query，word执念的关系，
+数据可以描述为这样的关系对(Q; D; A; a)
+
+[Alternating Iterative Attention]
+encoding phase:  compute a set of vector representations
+    X = (x1; : : : ; x|Xj)  document or query,vocabulary V
+    Each word is represented by a continuous word embedding
+    Encoder : GRU
+inference phase: 寻求文档和query之间的关系以确保腿短结果有证可寻
+iterative process：at each iteration, alternates attentive memory accesses to the 
+    query and the document
+prediction phase ： maximize the probability of the correct answer
+
+[Experiments]
+  batch_size: 32
+  optimizer : SGD with Adam
+  norm      : gradient > 5, gradient = 0.5*gradient
+  lr        : lr = 0.8*lr if accuracy of validation not change
+  embedding : 256 - 384
+  decoder   : 128 - 256
+  GRU       : 256 - 512
+  dropout   : 0.2 of inference GRU
+

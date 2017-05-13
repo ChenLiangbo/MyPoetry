@@ -151,8 +151,8 @@ def poem_to_vector(keyword_poetrys,vocabulary):
 		x1.extend(x2)
 		xdata.append(x1)
 
-		# y  = [0]*(max_list[0] + max_list[1])  # x y same length 
-		y  = [0]*max_list[2]  # x y different length
+		y  = [0]*(max_list[0] + max_list[1])  # x y same length 
+		# y  = [0]*max_list[2]  # x y different length
 		yn = string_to_num(kp[2],word_num_map)
 		y[:len(yn)] = yn
 		ydata.append(y)
@@ -234,6 +234,18 @@ def num_to_poem(seq_y,vocabulary):
 	return poem
 
 
+def split_data(xdata,ydata,dsplit):
+	length = int(dsplit[0]*shape[0]/10)
+	length1= int(dsplit[1]*shape[0]/10)
+	trainX = xdata[:length,:]
+	trainY = ydata[:length,:]
+	validX = xdata[length:length+length1,:]
+	validY = ydata[length:length+length1,:]
+	testX  = xdata[length+length1:,:]
+	testY  = ydata[length+length1:,:]
+	return trainX,trainY,validX,validY,testX,testY
+
+
 def rand_batch_gen(x, y, batch_size):
     while True:
         sample_idx = random.sample(list(np.arange(len(x))), batch_size)
@@ -251,23 +263,26 @@ def batch_gen(x, y, batch_size):
 if __name__ == '__main__':
 	import pickle
 	import time
+	import os
 	t1 = time.time()
 	dataset = '../newdata/'
 	temp = '../data/'
 	poetry_file = dataset + 'quatrain7'
+	if not os.path.exists(temp):
+		os.mkdir(temp)
 
 	# keyword_poetrys = keyword_poem(poetry_file) # get keyword from whole poem
-	keyword_poetrys = keyword_line(poetry_file) # get keyword line by line
+	# keyword_poetrys = keyword_line(poetry_file) # get keyword line by line
 
 
-	fpx = open(temp + 'keyword_poetrys.pkl','wb')
-	pickle.dump(keyword_poetrys,fpx)
-	fpx.close()
-
-	# fpx = open(temp + 'keyword_poetrys.pkl','rb')
-	# keyword_poetrys = pickle.load(fpx)
-	# keyword_poetrys = polish_poem(keyword_poetrys)
+	# fpx = open(temp + 'keyword_poetrys.pkl','wb')
+	# pickle.dump(keyword_poetrys,fpx)
 	# fpx.close()
+
+	fpx = open(temp + 'keyword_poetrys.pkl','rb')
+	keyword_poetrys = pickle.load(fpx)
+	# keyword_poetrys = polish_poem(keyword_poetrys)
+	fpx.close()
 	# print("keyword_poetrys = ",len(keyword_poetrys))
 	# print("keyword_poetrys = ",keyword_poetrys[0:3])
 
@@ -277,8 +292,8 @@ if __name__ == '__main__':
 	xdata,ydata = poem_to_vector(keyword_poetrys,vocabulary)
 	print("xdata = ",xdata.shape)
 	print("ydata = ",ydata.shape)
-	np.save("../data/xdata1",xdata)
-	np.save("../data/ydata1",ydata)
+	np.save(temp + "xdata",xdata)
+	np.save(temp + "ydata",ydata)
 
 	# one_hot_x,one_hot_y = data_util.one_hot_vectorize(keyword_poetrys,vocabulary)
 	# print("one_hot_x = ",one_hot_x.shape)

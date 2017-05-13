@@ -66,6 +66,7 @@
 	log    : out.log
 	model  : embedding_attention_seq2seq
 	ability: 821.238187  for keyword extract
+	results: 模型有收敛的趋势，诗句中重复的词太多。效果不好。
 
 ----
 	server : 41
@@ -76,7 +77,18 @@
 	file   : quatrain/demo/train.py
 	log    : out.log
 	model  : embedding_rnn_seq2seq
-	ability: 
+	ability:  867.138663 
+	results: 该模型下，loss越来越高，不收敛！
+	finished!
+
+	--------
+	time   : 5.13 12:50
+	input  : (?,26)
+	output : (?,26)
+	file   : quatrain/demo/train.py
+	model  : embedding_attention_seq2seq
+	results:
+
 
 ----
 	server : 42
@@ -87,17 +99,59 @@
 	file   : quatrain/demo/train.py
 	log    : out.log
 	model  : embedding_rnn_seq2seq
-	ability: 
+	ability: 有收敛的趋势，诗句中汉字重复的情况比40的模型有所减少！结果看起来还不错
 
 
 not started
 ----
 	server : 21
-	time   : 5.10 14:27
+	time   : 5.12 10:15
 	input  : (?,26)
-	output : (?,7)
+	output : (?,26)
 	epoch  : 100000
 	file   : quatrain/demo/train.py
 	log    : out.log
 	model  : embedding_attention_seq2seq
 	ability: 913.69s for keyword extract
+
+
+[TensorFlow Seq2Seq]     tf.nn.seq2seq.py
+RNN encoder-decoder sequence-to-sequence model
+http://wiki.jikexueyuan.com/project/tensorflow-zh/tutorials/seq2seq.html
+1,'basic_rnn_seq2seq', 
+2,'embedding_attention_seq2seq', 
+3,'embedding_rnn_seq2seq', 
+4,'embedding_tied_rnn_seq2seq', 
+5,one2many_rnn_seq2seq',
+6,'tied_rnn_seq2seq',
+
+----
+    outputs, states = basic_rnn_seq2seq(encoder_inputs, decoder_inputs, cell)
+    ----
+	encoder_inputs : are a list of tensors representing inputs to the encoder,A,B,C
+	decoder_inputs : are tensors representing inputs to the decoder, GO, W, X, Y, Z
+	cell           : is an instance of the models.rnn.rnn_cell.RNNCell ,GRUCell or LSTMCell
+	               : rnn_cell provides wrappers to construct multi-layer cells
+  Out:
+ 	outputs,states : lists of tensors of the same length as decoder_inputs 
+ 	outputs : outputs of the decoder in each time-step , W, X, Y, Z, EOS   
+ 	states  : represent the internal state of the decoder at every time-step          
+
+  Mostly:
+    output of the decoder at time t is fed back and becomes the input of the decoder at time t+1
+----
+	outputs, states = embedding_rnn_seq2seq(
+    encoder_inputs, decoder_inputs, cell,
+    num_encoder_symbols, num_decoder_symbols,
+    output_projection=None, feed_previous=False)
+    --
+    In:
+      1,encoder_inputs and decoder_inputs are integer-tensors that represent discrete values,embedded into a dense representation 
+      2,num_encoder_symbols on the encoder side, and num_decoder_symbols on the decoder side,maximum number of discrete symbols
+      3,feed_previous 
+      	False: the decoder will use decoder_inputs tensors as provided
+      	True : the decoder would only use the first element of decoder_inputs,the previous output of the encoder would be used,used for decoding translations in our translation model, but it can also be used during training
+      4,output_projection
+        not specified (None):  the outputs of the embedding model will be tensors of shape batch-size by num_decoder_symbols as they represent the logits for each generated symbol
+----
+

@@ -8,8 +8,8 @@ import pickle
 data = '../data/'
 ckpt = '../ckpt/'
 
-xdata = np.load(data + 'xdata1.npy')
-ydata = np.load(data + 'ydata1.npy')
+xdata = np.load(data + 'xdata.npy')
+ydata = np.load(data + 'ydata.npy')
 print("xdata = ",xdata.shape)  # (246152, 26)
 print("ydata = ",ydata.shape)  # (246152, 26)
 print(xdata[10])
@@ -18,15 +18,7 @@ print("-"*80)
 shape = xdata.shape
 # train validate,test
 dsplit = [9.5,0.2,0.3]
-length = int(dsplit[0]*shape[0]/10)
-length1= int(dsplit[1]*shape[0]/10)
-
-trainX = xdata[:length,:]
-trainY = ydata[:length,:]
-validX = xdata[length:length+length1,:]
-validY = ydata[length:length+length1,:]
-testX  = xdata[length+length1:,:]
-testY  = ydata[length+length1:,:]
+trainX,trainY,validX,validY,testX,testY= data_util.split_data(xdata,ydata,dsplit)
 print("train = ",trainX.shape,"validate = ",validX.shape,"test = ",testX.shape)
 
 

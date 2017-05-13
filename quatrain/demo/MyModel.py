@@ -64,26 +64,26 @@ class Seq2Seq(object):
                 # build the seq2seq model 
                 #  inputs : encoder, decoder inputs, LSTM cell type, vocabulary sizes, embedding dimensions
 
-                self.decode_outputs, self.decode_states = tf.nn.seq2seq.embedding_rnn_seq2seq(self.enc_ip,self.dec_ip, stacked_lstm,
-                                                    xvocab_size, yvocab_size, emb_dim)
+                # self.decode_outputs, self.decode_states = tf.nn.seq2seq.embedding_rnn_seq2seq(self.enc_ip,self.dec_ip, stacked_lstm,
+                #                                     xvocab_size, yvocab_size, emb_dim)
           
 
                 # atteintion based seq2seq
-                # self.decode_outputs, self.decode_states = tf.nn.seq2seq.embedding_attention_seq2seq(
-                #     self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
-                #     feed_previous=True)
+                self.decode_outputs, self.decode_states = tf.nn.seq2seq.embedding_attention_seq2seq(
+                    self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
+                    feed_previous=True)
 
                 # share parameters
                 scope.reuse_variables()
 
-                self.decode_outputs_test, self.decode_states_test = tf.nn.seq2seq.embedding_rnn_seq2seq(
-                    self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
-                    feed_previous=True)
-
-                # atteintion based seq2seq
-                # self.decode_outputs_test, self.decode_states_test = tf.nn.seq2seq.embedding_attention_seq2seq(
+                # self.decode_outputs_test, self.decode_states_test = tf.nn.seq2seq.embedding_rnn_seq2seq(
                 #     self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
                 #     feed_previous=True)
+
+                # atteintion based seq2seq
+                self.decode_outputs_test, self.decode_states_test = tf.nn.seq2seq.embedding_attention_seq2seq(
+                    self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
+                    feed_previous=False)
 
 
 

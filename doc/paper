@@ -334,3 +334,16 @@ prediction phase ： maximize the probability of the correct answer
   GRU       : 256 - 512
   dropout   : 0.2 of inference GRU
 
+===========================================================================
+[17]Neural Machine Translation by Joint Learning to Align and Translate
+===========================================================================
+内容：定长的序列模型限制了魔性的使用，所以文中使用不定长的序列来实现机器翻译，模型根据输入的不同，自动寻找与输出相关的部分，然后生成翻译的结果输出。模型在英语-法语翻译任务上进行得到测试。文中提出的模型是对传统encoder-decoder魔性的扩展，是模型具有联合翻译的能力。每一个时刻，模型产生一个单词输出的额时候，都会在输入的源句里面寻找最相关的信息，所以产生的输出不仅和当前已经生成的输出结果相关，还输入中的有关信息相关。
+创意：模型的创意在于不是一次性间输入序列encode到一个固定长度的向量，而是将输入序列编码到一系列的向量序列中，在解码的时候从这一系列的序列向量中选择一部分，这样的方式可以解决原来模型中不管输入序列用没有用都必须一次性选择，然后对输出必有影响的局限。于是现在变成了，输出是收到输入序列影响的，但是这种影响的重要性被分成了很多小的子部分，在每次输出的时候收到什么成分影响，影响的大小如何完全由模型来自动决定。
+
+[model]
+encoder: a bidirectional RNN,这种RNN包括了前向和反向，前向的时候按照顺序读入输入序列，反向的时候将输入序列逆序读入，都计算隐含状态。
+decoder: a decoder that emulates searching through a source sentence during decoding a translation (speech recognition perform well)
+
+[Experiments]
+--dataset : English-to-French translation,  ACL WMT ’14
+--

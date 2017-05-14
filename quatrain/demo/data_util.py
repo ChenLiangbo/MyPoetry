@@ -235,6 +235,7 @@ def num_to_poem(seq_y,vocabulary):
 
 
 def split_data(xdata,ydata,dsplit):
+	shape = xdata.shape
 	length = int(dsplit[0]*shape[0]/10)
 	length1= int(dsplit[1]*shape[0]/10)
 	trainX = xdata[:length,:]

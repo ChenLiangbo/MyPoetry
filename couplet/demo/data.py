@@ -114,6 +114,7 @@ def couplet_to_vector(couplet,vocabulary):
 # 根据比例将数据集拆分为 training set,validation set,test set
 # dsplit = [9.5,0.2,0.3]
 def split_data(xdata,ydata,dsplit = [9.5,0.2,0.3]):
+	shape = xdata.shape
 	length = int(dsplit[0]*shape[0]/10)
 	length1= int(dsplit[1]*shape[0]/10)
 	trainX = xdata[:length,:]
@@ -123,6 +124,21 @@ def split_data(xdata,ydata,dsplit = [9.5,0.2,0.3]):
 	testX  = xdata[length+length1:,:]
 	testY  = ydata[length+length1:,:]
 	return trainX,trainY,validX,validY,testX,testY
+
+
+def rand_batch_gen(x, y, batch_size):
+    while True:
+        sample_idx = random.sample(list(np.arange(len(x))), batch_size)
+        yield x[sample_idx].T, y[sample_idx].T
+
+
+def batch_gen(x, y, batch_size):
+    # infinite while
+    while True:
+        for i in range(0, len(x), batch_size):
+            if (i+1)*batch_size < len(x):
+                yield x[i : (i+1)*batch_size ].T, y[i : (i+1)*batch_size ].T
+
 
 
 if __name__ == '__main__':

@@ -102,17 +102,7 @@
 	ability: 有收敛的趋势，诗句中汉字重复的情况比40的模型有所减少！结果看起来还不错
 
 
-not started
-----
-	server : 21
-	time   : 5.12 10:15
-	input  : (?,26)
-	output : (?,26)
-	epoch  : 100000
-	file   : quatrain/demo/train.py
-	log    : out.log
-	model  : embedding_attention_seq2seq
-	ability: 913.69s for keyword extract
+
 
 
 [TensorFlow Seq2Seq]     tf.nn.seq2seq.py

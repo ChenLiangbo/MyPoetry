@@ -1,5 +1,9 @@
+#!usr/bin/env/python 
+# -*- coding: utf-8 -*-
 
-
-batches = helpers.random_sequences(length_from=length_from, length_to=length_to,
-                                       vocab_lower=vocab_lower, vocab_upper=vocab_upper,
-                                       batch_size=batch_size)
+import numpy as np
+r = np.random
+alist = list(range(20))
+print(alist)
+r.shuffle(alist)
+print(alist)

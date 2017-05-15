@@ -1,9 +1,14 @@
 对联来源
 1，网络资源：http://www.diyifanwen.com/tool/duiliandaquan/
 2，对联：联律新编（上篇）
-3，清联三百副(李学文编著) 
+3，清联三百副(李学文编著)
+4，风景对联三千幅 之一天地 
+4，风景对联三千幅 之一日月
 
 
+训练：42 服务器
+模型：attention  LSTM(2 x 512)
+时间：5.15 11:35
 
 dataset:couplet.txt  len(line) <= 30
 

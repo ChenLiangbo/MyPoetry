@@ -4,6 +4,7 @@ import os
 import numpy as np
 import collections
 import pickle
+import random
 
 EOS = 1  # 'EOS' in vocabulary
 PAD = 0
@@ -115,6 +116,10 @@ def couplet_to_vector(couplet,vocabulary):
 # dsplit = [9.5,0.2,0.3]
 def split_data(xdata,ydata,dsplit = [9.5,0.2,0.3]):
 	shape = xdata.shape
+	index = list(range(shape[0]))
+	np.random.shuffle(index)
+	xdata = xdata[index,:]
+	ydata = ydata[index,:]
 	length = int(dsplit[0]*shape[0]/10)
 	length1= int(dsplit[1]*shape[0]/10)
 	trainX = xdata[:length,:]

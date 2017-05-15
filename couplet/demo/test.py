@@ -1,6 +1,5 @@
 #!usr/bin/env/python 
 # -*- coding: utf-8 -*-
-
 import numpy as np
 from model import Seq2Seq
 import data as data_util
@@ -27,37 +26,39 @@ num_to_word = dict(zip(range(len(vocabulary)),vocabulary))
 
 xseq_len = xdata.shape[-1]
 yseq_len = ydata.shape[-1]
+print("xseq_len = ",xseq_len,"yseq_len = ",yseq_len)
 batch_size = 32
 # xvocab_size = len(metadata['idx2w'])  
 xvocab_size = len(vocabulary)
 yvocab_size = xvocab_size
-emb_dim = 1024
+emb_dim = 512
 
+model = Seq2Seq(xseq_len = xseq_len,
+  yseq_len    = yseq_len,
+  xvocab_size = xvocab_size,
+  yvocab_size = yvocab_size,
+  ckpt_path   = ckpt,
+  emb_dim     = emb_dim,
+  num_layers  = 2
+  )
 
-model = Seq2Seq(xseq_len    = xseq_len,
-                        yseq_len    = yseq_len,
-                        xvocab_size = xvocab_size,
-                        yvocab_size = yvocab_size,
-                        ckpt_path   = ckpt,
-                        emb_dim     = emb_dim,
-                        num_layers  = 3
-                         )
 # sess = model.restore_last_session()
 sess = model.load_model()
-'''
+
 predictY = model.predict(sess,testX)
 print("predictY = ",predictY.shape,"testX = ",testX.shape,"testY = ",testY.shape)
 for i in range(10):
     y1 = predictY[i,:]
     y2 = testY[i,:]
-    real = data_util.num_to_poem(y2,vocabulary)
-    fake = data_util.num_to_poem(y1,vocabulary)
+    real = data_util.decode_to_string(y2,num_to_word)
+    fake = data_util.decode_to_string(y1,num_to_word)
     print("real = ",real)
     print("fake = ",fake)
     print('-'*80)
 print('+'*80)
-'''
 
+print("testX = ",testX.shape)
+print("testY = ",testY.shape)
 shape = testX.shape
 for i in range(100):
       x = testX[i,:].reshape((1,shape[1]))

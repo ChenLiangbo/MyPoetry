@@ -25,7 +25,11 @@ class Seq2Seq(object):
         if not os.path.exists(self.ckpt_path):
             os.mkdir(self.ckpt_path)
 
+        # build thy graph
+        #  attach any part of the graph that needs to be exposed, to the self
         def __graph__():
+
+            # placeholders
             tf.reset_default_graph()
             #  encoder inputs : list of indices of length xseq_len
             self.enc_ip = [ tf.placeholder(shape=[None,], 
@@ -43,7 +47,7 @@ class Seq2Seq(object):
 
             # Basic LSTM cell wrapped in Dropout Wrapper
             self.keep_prob = tf.placeholder(tf.float32)
-
+            # define the basic cell
             # basic_cell = tf.contrib.rnn.core_rnn_cell.DropoutWrapper(
             #         tf.contrib.rnn.core_rnn_cell.BasicLSTMCell(emb_dim, state_is_tuple=True),
             #         output_keep_prob=self.keep_prob)
@@ -51,11 +55,13 @@ class Seq2Seq(object):
                     tf.contrib.rnn.rnn_cell.BasicLSTMCell(emb_dim, state_is_tuple=True),
                     output_keep_prob=self.keep_prob)  # tf 0.12.0
 
+            # stack cells together : n layered model
             # stacked_lstm = tf.contrib.rnn.core_rnn_cell.MultiRNNCell([basic_cell]*num_layers, state_is_tuple=True)
             stacked_lstm = tf.contrib.rnn.rnn_cell.MultiRNNCell([basic_cell]*num_layers, state_is_tuple=True) # tf 0.12.0
 
 
             with tf.variable_scope('decoder') as scope:
+                # build the seq2seq model 
                 #  inputs : encoder, decoder inputs, LSTM cell type, vocabulary sizes, embedding dimensions
 
                 # self.decode_outputs, self.decode_states = tf.nn.seq2seq.embedding_rnn_seq2seq(self.enc_ip,self.dec_ip, stacked_lstm,
@@ -77,19 +83,34 @@ class Seq2Seq(object):
                 # atteintion based seq2seq
                 self.decode_outputs_test, self.decode_states_test = tf.nn.seq2seq.embedding_attention_seq2seq(
                     self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
-                    feed_previous=False)
+                    feed_previous=True)
 
 
+
+            # now, for training,
+            #  build loss function
+
+            # weighted loss
+            #  TODO : add parameter hint
             loss_weights = [ tf.ones_like(label, dtype=tf.float32) for label in self.labels ]
             # self.loss = tf.contrib.legacy_seq2seq.sequence_loss(self.decode_outputs, self.labels, loss_weights, yvocab_size)
             self.loss = tf.nn.seq2seq.sequence_loss(self.decode_outputs, self.labels, loss_weights, yvocab_size) # tf 0.12.0
             # train op to minimize the loss
             self.train_op = tf.train.AdamOptimizer(learning_rate=lr).minimize(self.loss)
 
+        # sys.stdout.write('<log> Building Graph ')
         print("Building Graph successfully!")
+        # build comput graph
         __graph__()
+        # sys.stdout.write('</log>')
         
 
+
+
+    '''
+        Training and Evaluation
+
+    '''
 
     # get the feed dictionary
     def get_feed(self, X, Y, keep_prob):
@@ -126,52 +147,82 @@ class Seq2Seq(object):
             losses.append(loss_v)
         return np.mean(losses)
 
-
+    # finally the train function that
+    #  runs the train_op in a session
+    #   evaluates on valid set periodically
+    #    prints statistics
     def train(self, train_set, valid_set, sess=None ):
+        
+        # we need to save the model periodically
         saver = tf.train.Saver()
+
+
+        # if no session is given
         if not sess:
             try:
                 # sess = self.restore_last_session()
                 sess = self.load_model()
-                print("Load model okay,train again !")
+                print("Load model okay, train again!")
             except Exception as ex:
                 print("[Exception Information] ",str(ex))
+                # create a session
                 sess = tf.Session()
-
+                # init all variables
         sess.run(tf.global_variables_initializer())
-        print("Training started ...")
 
+        # sys.stdout.write('\n<log> Training started </log>\n')
+        print("Training started ...")
+        # run M epochs
         for i in range(self.epochs):
             try:
-                self.train_batch(sess, train_set)
-                if i and i% (self.epochs//100) == 0: 
-                    # saver.save(sess, self.ckpt_path + self.model_name + '.ckpt', global_step=i)
-                    saver.save(sess, self.ckpt_path + self.model_name + '.data')
+                if i % 2 == 0:
+                    print("i = ",i)
                     val_loss = self.eval_batches(sess, valid_set, 16) # TODO : and this
+                    # print stats
+                    print('epoch = %d,val_loss = %f ' % (i,val_loss))
+
+                self.train_batch(sess, train_set)
+                if i % 3 == 0: # TODO : make this tunable by the user
+                    # save model to disk
+                    # saver.save(sess, self.ckpt_path + self.model_name + '.ckpt', global_step=i)
+                    saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
+                    # evaluate to get validation loss
+                    # val_loss = self.eval_batches(sess, valid_set, 16) # TODO : and this
+                    # print stats
                     print('\nModel saved to disk at iteration #{}'.format(i))
-                    print('val   loss : {0:.6f}'.format(val_loss))
-            except KeyboardInterrupt: 
+                    # print('val   loss : {0:.6f}'.format(val_loss))
+                    # sys.stdout.flush()
+            except KeyboardInterrupt: # this will most definitely happen, so handle it
                 print('Interrupted by user at iteration {}'.format(i))
                 self.session = sess
-                saver.save(sess, self.ckpt_path + self.model_name + '.ckpt', global_step=i)
+                saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
                 return sess
-        saver.save(sess, self.ckpt_path + self.model_name + '.data')
+            saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
 
     def restore_last_session(self):
         saver = tf.train.Saver()
+        # create a session
         sess = tf.Session()
+        # get checkpoint state
         ckpt = tf.train.get_checkpoint_state(self.ckpt_path)
+        # restore session
         if ckpt and ckpt.model_checkpoint_path:
             saver.restore(sess, ckpt.model_checkpoint_path)
+        # return to user
         print("load model okay!")
         return sess
 
     def load_model(self,):
         saver = tf.train.Saver()
+        # create a session
         sess = tf.Session()
-        saver.restore(sess, self.ckpt_path + self.model_name + '.data')
+        # get checkpoint state
+        saver.restore(sess,self.ckpt_path + self.model_name + '.ckpt')
+        # return to user
+        print("load model okay!")
         return sess
 
+    # prediction
     def predict(self, sess, X):
         feed_dict = {self.enc_ip[t]: X[:,t] for t in range(self.xseq_len)}
         feed_dict[self.keep_prob] = 1.

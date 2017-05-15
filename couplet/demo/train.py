@@ -26,6 +26,7 @@ num_to_word = dict(zip(range(len(vocabulary)),vocabulary))
 
 xseq_len = xdata.shape[-1]
 yseq_len = ydata.shape[-1]
+print("xseq_len = ",xseq_len,"yseq_len = ",yseq_len)
 batch_size = 32
 # xvocab_size = len(metadata['idx2w'])  
 xvocab_size = len(vocabulary)

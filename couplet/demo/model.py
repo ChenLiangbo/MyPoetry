@@ -71,7 +71,7 @@ class Seq2Seq(object):
                 # atteintion based seq2seq
                 self.decode_outputs, self.decode_states = tf.nn.seq2seq.embedding_attention_seq2seq(
                     self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
-                    feed_previous=True)
+                    feed_previous=False)
 
                 # share parameters
                 scope.reuse_variables()
@@ -83,7 +83,7 @@ class Seq2Seq(object):
                 # atteintion based seq2seq
                 self.decode_outputs_test, self.decode_states_test = tf.nn.seq2seq.embedding_attention_seq2seq(
                     self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
-                    feed_previous=True)
+                    feed_previous=False)
 
 
 
@@ -176,7 +176,7 @@ class Seq2Seq(object):
         for i in range(self.epochs):
             try:
                 if i % 2 == 0:
-                    print("i = ",i)
+                    # print("i = ",i)
                     val_loss = self.eval_batches(sess, valid_set, 16) # TODO : and this
                     # print stats
                     print('epoch = %d,val_loss = %f ' % (i,val_loss))

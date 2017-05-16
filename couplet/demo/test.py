@@ -45,17 +45,17 @@ model = Seq2Seq(xseq_len = xseq_len,
 # sess = model.restore_last_session()
 sess = model.load_model()
 
-predictY = model.predict(sess,testX)
-print("predictY = ",predictY.shape,"testX = ",testX.shape,"testY = ",testY.shape)
-for i in range(10):
-    y1 = predictY[i,:]
-    y2 = testY[i,:]
-    real = data_util.decode_to_string(y2,num_to_word)
-    fake = data_util.decode_to_string(y1,num_to_word)
-    print("real = ",real)
-    print("fake = ",fake)
-    print('-'*80)
-print('+'*80)
+# predictY = model.predict(sess,testX)
+# print("predictY = ",predictY.shape,"testX = ",testX.shape,"testY = ",testY.shape)
+# for i in range(10):
+#     y1 = predictY[i,:]
+#     y2 = testY[i,:]
+#     real = data_util.decode_to_string(y2,num_to_word)
+#     fake = data_util.decode_to_string(y1,num_to_word)
+#     print("real = ",real)
+#     print("fake = ",fake)
+#     print('-'*80)
+# print('+'*80)
 
 print("testX = ",testX.shape)
 print("testY = ",testY.shape)
@@ -67,7 +67,7 @@ for i in range(100):
       py= model.predict_one(sess,x)
       #print("py = ",py)
       #print("y = ",y)
-      couplet_up = data_util.decode_to_string(x,num_to_word)
+      couplet_up = data_util.decode_to_string(x[0],num_to_word)
       real = data_util.decode_to_string(y[0],num_to_word)
       fake = data_util.decode_to_string(py[0],num_to_word)
       print("couplet_up is   : ",couplet_up)

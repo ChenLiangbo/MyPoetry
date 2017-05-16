@@ -83,7 +83,7 @@ class Seq2Seq(object):
                 # atteintion based seq2seq
                 self.decode_outputs_test, self.decode_states_test = tf.nn.seq2seq.embedding_attention_seq2seq(
                     self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
-                    feed_previous=False)
+                    feed_previous=True)
 
 
 

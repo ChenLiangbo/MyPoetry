@@ -363,6 +363,16 @@ def soort_good(good_file,out_file):
 	f_out.close()
 
 
+def get_couplet_dataset(good_file,length = 30):
+	f_good = open(good_file,'r',encoding = 'utf-8')
+	fp_out = open('../dataset/couplet1.txt','w')
+	lines = f_good.readlines()
+	for line in lines:
+		if len(line.split(' ')[0]) < length:
+			fp_out.write(line)
+	f_good.close()
+	fp_out.close()
+
 if __name__ == '__main__':
 	fin_name = '../raw/temp.txt'
 	fout_name= '../raw/out.txt'
@@ -374,4 +384,5 @@ if __name__ == '__main__':
 	# split_c3(fin_name,fout_name)
 	# split_c4(fin_name,fout_name)
 	# split_better(fin_name,fout_name)
-	soort_good('../raw/good.txt','../raw/out.txt')
+	# soort_good('../raw/good.txt','../raw/out.txt')
+	get_couplet_dataset('../dataset/good.txt',length = 30)

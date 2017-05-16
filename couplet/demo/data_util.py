@@ -373,9 +373,104 @@ def get_couplet_dataset(good_file,length = 30):
 	f_good.close()
 	fp_out.close()
 
+
+# 峯如双髻黒，（六联上）； 身似九仙轻。（六联下）。 情况处理
+def deal_situation1(fin_name,fout_name):
+	fp_in = open(fin_name,'r',encoding = 'utf-8')
+	fp_out  = open(fout_name,'w')
+	lines = fp_in.readlines()
+	lines.sort(key = f_key)
+	for line in lines:
+		line = line.strip('\n')
+		if ' ' in line:
+			line = line.split(' ')
+		elif ' ' in line:
+			line = line.split(' ')
+		else:
+			line = line.split('；')
+		if len(line) != 2:
+			continue
+		s1 = line[0]
+		s2 = line[1]
+		if ('（' in s1) and ('）' in s1):
+			try:
+				s1 = s1.split('（')[0]
+				s2 = s2.split('（')[0]
+				if s1.endswith('，'):
+					s1.replace('，','；')
+				couplet = s1 + ' ' + s2 + '\n'
+				fp_out.write(couplet)
+			except:
+				pass
+		else:
+			fp_out.write(s1 + ' ' + s2 + '\n')
+
+# 浮云游子意，⊙平⊙仄仄并添高阁回，⊙平⊙仄仄； 挥手自兹去，⊙仄⊙平仄越鸟巢干后，⊙仄⊙平仄。
+def deal_situation2(fin_name,fout_name):
+	fp_in = open(fin_name,'r',encoding = 'utf-8')
+	fp_out  = open(fout_name,'w')
+	lines = fp_in.readlines()
+	lines.sort(key = f_key)
+	for line in lines:
+		line = line.strip('\n')
+		if ' ' in line:
+			line = line.split(' ')
+		elif ' ' in line:
+			line = line.split(' ')
+		else:
+			line = line.split('；')
+		if len(line) != 2:
+			continue
+		s1 = line[0]
+		s2 = line[1]
+		# print("s1 = ",s1)
+		if ('⊙'in s1) and ('⊙' in s2):
+			# print("⊙ in s1")
+			try:
+				s1 = s1.split('⊙')[0]
+				s2 = s2.split('⊙')[0]
+				couplet = s1 + ' ' + s2 + '\n'
+				fp_out.write(couplet)
+			except:
+				pass
+		else:
+			fp_out.write(s1 + ' ' + s2 + '\n')
+
+# [对句]邪气蓬勃，羞愧半生双泪错[蒲公]； [出句]春潮涌动，风流一夜百花娇[老方]
+def deal_situation3(fin_name,fout_name):
+	fp_in = open(fin_name,'r',encoding = 'utf-8')
+	fp_out  = open(fout_name,'w')
+	lines = fp_in.readlines()
+	# lines.sort(key = f_key)
+	for line in lines:
+		line = line.strip('\n')
+		if ' ' in line:
+			line = line.split(' ')
+		elif ' ' in line:
+			line = line.split(' ')
+		else:
+			line = line.split('；')
+		if len(line) != 2:
+			continue
+		s1 = line[0]
+		s2 = line[1]
+		# print("s1 = ",s1)
+		if ('['in s1) and ('句' in s2):
+			# print("⊙ in s1")
+			try:
+				s1 = s1.split(']')[1].split('[')[0] + '；'
+				s2 = s2.split(']')[1].split('[')[0] + '。'
+				couplet = s1 + ' ' + s2 + '\n'
+				fp_out.write(couplet)
+			except:
+				pass
+		else:
+			fp_out.write(s1 + ' ' + s2 + '\n')
+
 if __name__ == '__main__':
-	fin_name = '../raw/temp.txt'
-	fout_name= '../raw/out.txt'
+	fin_name = '../dataset/couplet2.txt'
+	# fin_name = '../temp/s3.txt'
+	fout_name= '../temp/out.txt'
 	# get_couplet_from_book(fin_name,fout_name)
 	# split_couplet(fin_name)
 	# dui_split(fin_name,fout_name)
@@ -385,4 +480,5 @@ if __name__ == '__main__':
 	# split_c4(fin_name,fout_name)
 	# split_better(fin_name,fout_name)
 	# soort_good('../raw/good.txt','../raw/out.txt')
-	get_couplet_dataset('../dataset/good.txt',length = 30)
+	# get_couplet_dataset('../dataset/good.txt',length = 30)
+	deal_situation3(fin_name,fout_name)

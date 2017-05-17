@@ -365,10 +365,10 @@ def soort_good(good_file,out_file):
 
 def get_couplet_dataset(good_file,length = 30):
 	f_good = open(good_file,'r',encoding = 'utf-8')
-	fp_out = open('../dataset/couplet1.txt','w')
+	fp_out = open('./dataset/couplet.txt','w')
 	lines = f_good.readlines()
 	for line in lines:
-		if len(line.split(' ')[0]) < length:
+		if len(line.split(' ')[0]) <= length:
 			fp_out.write(line)
 	f_good.close()
 	fp_out.close()
@@ -468,9 +468,9 @@ def deal_situation3(fin_name,fout_name):
 			fp_out.write(s1 + ' ' + s2 + '\n')
 
 if __name__ == '__main__':
-	fin_name = '../dataset/couplet2.txt'
+	fin_name = './dataset/couplet2.txt'
 	# fin_name = '../temp/s3.txt'
-	fout_name= '../temp/out.txt'
+	fout_name= './out.txt'
 	# get_couplet_from_book(fin_name,fout_name)
 	# split_couplet(fin_name)
 	# dui_split(fin_name,fout_name)
@@ -480,5 +480,5 @@ if __name__ == '__main__':
 	# split_c4(fin_name,fout_name)
 	# split_better(fin_name,fout_name)
 	# soort_good('../raw/good.txt','../raw/out.txt')
-	# get_couplet_dataset('../dataset/good.txt',length = 30)
+	get_couplet_dataset('./dataset/couplet_okay.txt',length = 6)
 	# deal_situation3(fin_name,fout_name)

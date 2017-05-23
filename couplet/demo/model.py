@@ -177,21 +177,16 @@ class Seq2Seq(object):
             try:
                 if i % 2 == 0:
                     # print("i = ",i)
-                    val_loss = self.eval_batches(sess, valid_set, 16) # TODO : and this
-                    # print stats
+                    val_loss = self.eval_batches(sess, valid_set, 32)
                     print('epoch = %d,val_loss = %f ' % (i,val_loss))
 
                 self.train_batch(sess, train_set)
-                if i % 3 == 0: # TODO : make this tunable by the user
-                    # save model to disk
+                if i % 3 == 0: 
                     # saver.save(sess, self.ckpt_path + self.model_name + '.ckpt', global_step=i)
                     saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
                     # evaluate to get validation loss
                     # val_loss = self.eval_batches(sess, valid_set, 16) # TODO : and this
-                    # print stats
                     print('\nModel saved to disk at iteration #{}'.format(i))
-                    # print('val   loss : {0:.6f}'.format(val_loss))
-                    # sys.stdout.flush()
             except KeyboardInterrupt: # this will most definitely happen, so handle it
                 print('Interrupted by user at iteration {}'.format(i))
                 self.session = sess
@@ -201,24 +196,17 @@ class Seq2Seq(object):
 
     def restore_last_session(self):
         saver = tf.train.Saver()
-        # create a session
         sess = tf.Session()
-        # get checkpoint state
         ckpt = tf.train.get_checkpoint_state(self.ckpt_path)
-        # restore session
         if ckpt and ckpt.model_checkpoint_path:
             saver.restore(sess, ckpt.model_checkpoint_path)
-        # return to user
         print("load model okay!")
         return sess
 
     def load_model(self,):
         saver = tf.train.Saver()
-        # create a session
         sess = tf.Session()
-        # get checkpoint state
         saver.restore(sess,self.ckpt_path + self.model_name + '.ckpt')
-        # return to user
         print("load model okay!")
         return sess
 

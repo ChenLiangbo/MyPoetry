@@ -16,8 +16,8 @@ print(ydata[10])
 print("-"*80)
 shape = xdata.shape
 # train validate,test
-dsplit = [9.5,0.2,0.3]
-trainX,trainY,validX,validY,testX,testY= data_util.split_data(xdata,ydata,dsplit)
+dsplit = [9.9,0.05,0.05]
+trainX,trainY,validX,validY,testX,testY= data_util.split_data(xdata,ydata,False,dsplit)
 print("train = ",trainX.shape,"validate = ",validX.shape,"test = ",testX.shape)
 vocabulary = data_util.read_vocabulary(ddir)
 
@@ -27,11 +27,11 @@ num_to_word = dict(zip(range(len(vocabulary)),vocabulary))
 xseq_len = xdata.shape[-1]
 yseq_len = ydata.shape[-1]
 print("xseq_len = ",xseq_len,"yseq_len = ",yseq_len)
-batch_size = 32
+batch_size = 64
 # xvocab_size = len(metadata['idx2w'])  
 xvocab_size = len(vocabulary)
 yvocab_size = xvocab_size
-emb_dim = 512
+emb_dim = 1024
 
 model = Seq2Seq(xseq_len = xseq_len,
 	yseq_len    = yseq_len,
@@ -39,7 +39,7 @@ model = Seq2Seq(xseq_len = xseq_len,
 	yvocab_size = yvocab_size,
 	ckpt_path   = ckpt,
 	emb_dim     = emb_dim,
-	num_layers  = 2
+	num_layers  = 3
 	)
 
 val_batch_gen = data_util.rand_batch_gen(validX, validY, 32)

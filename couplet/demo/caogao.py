@@ -11,9 +11,12 @@ def batch_gen(x, y, batch_size):
 
 if __name__ == '__main__':
     import numpy as np
-    data = np.random.random_sample((1000,4))
-    print("data = ",data.shape)
-    val_batch_gen = batch_gen(data,data,128)
+    ddir = '../data/'
+    ckpt = '../ckpt/'
+    xdata = np.load(ddir + 'xdata.npy')
+    ydata = np.load(ddir + 'ydata.npy')
+
+    val_batch_gen = batch_gen(xdata,ydata,128)
     batch = next(val_batch_gen)
     x = batch[0]
     y = batch[1]

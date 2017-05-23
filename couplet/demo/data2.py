@@ -18,7 +18,7 @@ PAD = 0
 # 上联结尾标识符中文；（分号），下联结尾标识符中文。（句号）
 def read_couplet(filename):
 	couplet = []  
-	with open(filename,'r',encoding = 'gbk') as f:
+	with open(filename,'r',encoding = 'utf-8') as f:
 		for line in f:
 			try:
 				if ',' in line:
@@ -189,11 +189,11 @@ def batch_gen(x, y, batch_size):
 
 
 if __name__ == '__main__':
-	data = './data/'
+	data = '../data/'
 	if not os.path.exists(data):
 		os.mkdir(data)
 
-	filename = './dataset/couplet.txt'
+	filename = '../dataset/couplet.txt'
 	couplet = read_couplet(filename)
 	print("couplet = ",couplet[0:10])
 	print("couplet = ",len(couplet))

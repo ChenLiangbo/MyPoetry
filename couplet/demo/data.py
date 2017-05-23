@@ -163,12 +163,13 @@ def couplet_to_vector(couplet,vocabulary):
 
 # 根据比例将数据集拆分为 training set,validation set,test set
 # dsplit = [9.5,0.2,0.3]
-def split_data(xdata,ydata,dsplit = [9.5,0.2,0.3]):
+def split_data(xdata,ydata,shuffle=False,dsplit = [9.5,0.2,0.3]):
 	shape = xdata.shape
-	index = list(range(shape[0]))
-	np.random.shuffle(index)
-	xdata = xdata[index,:]
-	ydata = ydata[index,:]
+	if shuffle:
+		index = list(range(shape[0]))
+		np.random.shuffle(index)
+		xdata = xdata[index,:]
+		ydata = ydata[index,:]
 	length = int(dsplit[0]*shape[0]/10)
 	length1= int(dsplit[1]*shape[0]/10)
 	trainX = xdata[:length,:]

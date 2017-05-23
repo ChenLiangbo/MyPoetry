@@ -55,7 +55,12 @@ ydata.npy    将会生成的中间数据，numpy矩阵，存储对联下联
 ------------------
 21 服务器
 模型：attention  LSTM(2 x 512)   feed_previous=False(训练)
-时间：5.16 12:12   
+时间：5.16 12:12   -- 2017.5.23 17:00 iterations = 33000 
+good results !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+store at: couplet-okay
+===========================================================================
+
+
 
 [couplet-test]
 特点：去除对联的结尾标识分号和句号，输入不加EOS，输出增加EOS，模型 LSTM (2 x 1024) attention
@@ -63,10 +68,24 @@ ydata.npy    将会生成的中间数据，numpy矩阵，存储对联下联
 data2
 时间：5.17 16:10 
 failed
+============================================================================
+
 
 42 server
 [couplet]
+model: 1204 x 3 LSTM
 date:2017.5.23 16:50
+data2.py---In: up line -> down line
+        ---In: down line -> up line
+shuffle: False
+
+
+21 server
+[couplet]
+model:512 x 2 LSTM
+data.py---In:up line -> down line
+date: 2017.5.23 18:14  ----> 
+shuffle: True,save train.test,valid to data directory
 
 -----------------------------------------------------------------------------------------
 dataset:couplet.txt  len(line) <= 30

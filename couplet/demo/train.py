@@ -17,10 +17,17 @@ print("-"*80)
 shape = xdata.shape
 # train validate,test
 dsplit = [9.9,0.05,0.05]
-trainX,trainY,validX,validY,testX,testY= data_util.split_data(xdata,ydata,False,dsplit)
+trainX,trainY,validX,validY,testX,testY= data_util.split_data(xdata,ydata,True,dsplit)
 print("train = ",trainX.shape,"validate = ",validX.shape,"test = ",testX.shape)
-vocabulary = data_util.read_vocabulary(ddir)
+np.save(ddir + 'trainX',trainX)
+np.save(ddir + 'trainY',trainY)
+np.save(ddir + 'testX',testX)
+np.save(ddir + 'testY',testY)
+np.save(ddir + 'validX',validX)
+np.save(ddir + 'validY',validY)
 
+
+vocabulary = data_util.read_vocabulary(ddir)
 word_to_num = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
 num_to_word = dict(zip(range(len(vocabulary)),vocabulary))
 

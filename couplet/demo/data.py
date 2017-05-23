@@ -65,6 +65,8 @@ def get_length(couplet):
 	for c in couplet:
 		if len(c[0]) > max_length:
 			max_length = len(c[0])
+		if len(c[1]) > max_length:
+			max_length = len(c[1])
 	return max_length
 
 # 一句中文对联转换为一个数值化的向量，返回值是列表
@@ -112,6 +114,53 @@ def couplet_to_vector(couplet,vocabulary):
 		ydata.append(y)
 	return np.array(xdata),np.array(ydata)
 
+
+'''
+In: up couplet -> Out: down couplet
+In: down couplet -> Out : up line
+def couplet_to_vector(couplet,vocabulary):
+	word_to_num = dict(zip(vocabulary,range(len(vocabulary))))
+	num_to_word = dict(zip(range(len(vocabulary)),vocabulary))
+	max_length = get_length(couplet) + 1  # 需要加上终止符
+	xdata_x = []  # 对联上联
+	ydata_y = []  # 对联下联
+
+	xdata_y = []  # 对联下联
+	ydata_x = []  # 对联上联
+	for c in couplet:
+		x = [0]*max_length
+		couplet_x = c[0]
+		couplet_xn = encode_to_vector_x(couplet_x,word_to_num)
+		x[:len(couplet_xn)] = couplet_xn
+		# print("x = ",x)
+		xdata_x.append(x)
+		# 将同一对联的下联作为输入 
+		y1 = [0]*max_length
+		couplet_yn1 = encode_to_vector_y(couplet_x,word_to_num)
+		y1[:len(couplet_yn1)] = couplet_yn1
+		# print("y1 = ",y1)
+		ydata_x.append(y1)
+
+
+		y = [0]*max_length
+		couplet_y = c[1]
+		couplet_yn = encode_to_vector_y(couplet_y,word_to_num)
+		y[:len(couplet_yn)] = couplet_yn
+		# print("y = ",y)
+		ydata_y.append(y)
+		x1 = [0]*max_length
+		couplet_xn1 = encode_to_vector_x(couplet_y,word_to_num)
+		x1[0:len(couplet_xn1)] = couplet_xn1
+		# print("x1 = ",x1)
+		xdata_y.append(x1)
+
+	xdata = np.vstack([np.array(xdata_x),np.array(xdata_y)])
+	ydata = np.vstack([np.array(ydata_y),np.array(ydata_x)])
+
+	return xdata,ydata
+'''
+
+
 # 根据比例将数据集拆分为 training set,validation set,test set
 # dsplit = [9.5,0.2,0.3]
 def split_data(xdata,ydata,dsplit = [9.5,0.2,0.3]):
@@ -144,7 +193,8 @@ def batch_gen(x, y, batch_size):
             if (i+1)*batch_size < len(x):
                 yield x[i : (i+1)*batch_size ].T, y[i : (i+1)*batch_size ].T
 
-
+def f_sort(line):
+	return len(line[0])
 
 if __name__ == '__main__':
 	data = '../data/'
@@ -153,6 +203,7 @@ if __name__ == '__main__':
 
 	filename = '../dataset/couplet.txt'
 	couplet = read_couplet(filename)
+	couplet.sort(key = f_sort)
 	print("couplet = ",len(couplet))
 	vocabulary = get_vacobulary(couplet)
 	print("vocabulary = ",len(vocabulary),vocabulary[0:10])

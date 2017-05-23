@@ -1,3 +1,6 @@
+#!usr/bin/env/python 
+# -*- coding: utf-8 -*-
+
 import tensorflow as tf
 import numpy as np
 import sys
@@ -42,6 +45,7 @@ class Seq2Seq(object):
                             name='ei_{}'.format(t)) for t in range(yseq_len) ]
 
             #  decoder inputs : 'GO' + [ y1, y2, ... y_t-1 ]
+            # GO表示解码开始，用EOS表示解码结束，同时用PAD表示填充
             self.dec_ip = [ tf.zeros_like(self.enc_ip[0], dtype=tf.int64, name='GO') ] + self.labels[:-1]
 
 
@@ -96,6 +100,9 @@ class Seq2Seq(object):
             # self.loss = tf.contrib.legacy_seq2seq.sequence_loss(self.decode_outputs, self.labels, loss_weights, yvocab_size)
             self.loss = tf.nn.seq2seq.sequence_loss(self.decode_outputs, self.labels, loss_weights, yvocab_size) # tf 0.12.0
             # train op to minimize the loss
+            loss_biases = [tf.ones_like(label, dtype=tf.float32) for label in self.labels]
+            # self.loss = tf.nn.seq2seq.sampled_softmax_loss(loss_weights,loss_biases,self.decode_outputs,self.labels,
+            #     )
             self.train_op = tf.train.AdamOptimizer(learning_rate=lr).minimize(self.loss)
 
         # sys.stdout.write('<log> Building Graph ')

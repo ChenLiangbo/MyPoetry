@@ -6,6 +6,11 @@ import collections
 import pickle
 import random
 
+# This data file use both line up and line down as input
+# use line up as input then line down as output
+# use line down as input then line up as output
+
+
 EOS = 1  # 'EOS' in vocabulary
 PAD = 0
 # 从整理好的对联集里面读出对联数据

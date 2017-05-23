@@ -154,3 +154,20 @@ http://wiki.jikexueyuan.com/project/tensorflow-zh/tutorials/seq2seq.html
         not specified (None):  the outputs of the embedding model will be tensors of shape batch-size by num_decoder_symbols as they represent the logits for each generated symbol
 ----
 
+def embedding_attention_seq2seq(encoder_inputs, #[T， batch_size]
+                                decoder_inputs, #[out_T， batch_size]
+                                cell,
+                                num_encoder_symbols,
+                                num_decoder_symbols,
+                                embedding_size,
+                                num_heads=1, #只采用一个read head
+                                output_projection=None,
+                                feed_previous=False,
+                                dtype=None,
+                                scope=None,
+                                initial_state_attention=False)
+----这个函数创建了一个inputs 的 embedding matrix. 
+----计算了encoder的 output，并保存起来，用于计算attention
+----生成attention states
+----剩下的工作交给embedding_attention_decoder,
+----embedding_attention_decoder中创建了decoder的embedd

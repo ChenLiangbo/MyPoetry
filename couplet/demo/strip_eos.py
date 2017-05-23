@@ -5,6 +5,8 @@
 
 def is_valid_ends(astring):
 	aset = [',','.','?','!','，','；','。','？','!']
+	if len(astring) == 0:
+		return None
 	if list(astring)[-1] in aset:
 		return True
 	else:
@@ -22,7 +24,7 @@ def strip_one_line(line):
 	return line
 
 def strip_file(fin_name,fout_name):
-	fp_in = open(fin_name,'r',encoding = 'gbk')
+	fp_in = open(fin_name,'r',encoding = 'utf-8')
 	fp_out= open(fout_name,'w')
 	lines = fp_in.readlines()
 	for line in lines:
@@ -48,6 +50,6 @@ Out:
 '''
 
 if __name__ == '__main__':
-	fin_name = './dataset/couplet.txt'  # 对联数据机
-	fout_name= './dataset/out.txt'      # 输出文件
+	fin_name = '../dataset/couplet_okay.txt'  # 对联数据机
+	fout_name= '../dataset/couplet.txt'      # 输出文件
 	strip_file(fin_name,fout_name)

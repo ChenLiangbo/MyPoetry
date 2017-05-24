@@ -151,8 +151,8 @@ class Seq2Seq(object):
         # if no session is given
         if not sess:
             try:
-                # sess = self.restore_last_session()
-                sess = self.load_model()
+                sess = self.restore_last_session()
+                # sess = self.load_model()
                 print("Load model okay, train again!")
             except Exception as ex:
                 print("[Exception Information] ",str(ex))
@@ -198,6 +198,8 @@ class Seq2Seq(object):
             saver.restore(sess, ckpt.model_checkpoint_path)
         print("load model okay!")
         return sess
+
+
 
     def load_model(self,):
         saver = tf.train.Saver()

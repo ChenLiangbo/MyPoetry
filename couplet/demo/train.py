@@ -11,12 +11,15 @@ xdata = np.load(ddir + 'xdata.npy')
 ydata = np.load(ddir + 'ydata.npy')
 print("xdata = ",xdata.shape)  # (246152, 26)
 print("ydata = ",ydata.shape)  # (246152, 26)
+
+
 print(xdata[10])
 print(ydata[10])
 print("-"*80)
 shape = xdata.shape
 # train validate,test
 dsplit = [9.9,0.05,0.05]
+'''
 trainX,trainY,validX,validY,testX,testY= data_util.split_data(xdata,ydata,True,dsplit)
 print("train = ",trainX.shape,"validate = ",validX.shape,"test = ",testX.shape)
 np.save(ddir + 'trainX',trainX)
@@ -25,6 +28,13 @@ np.save(ddir + 'testX',testX)
 np.save(ddir + 'testY',testY)
 np.save(ddir + 'validX',validX)
 np.save(ddir + 'validY',validY)
+'''
+trainX = np.load(ddir + 'trainX.npy')
+trainY = np.load(ddir + 'trainY.npy')
+testX = np.load(ddir + 'testX.npy')
+testY = np.load(ddir + 'testY.npy')
+validX = np.load(ddir + 'validX.npy')
+validY = np.load(ddir + 'validY.npy')
 
 
 vocabulary = data_util.read_vocabulary(ddir)

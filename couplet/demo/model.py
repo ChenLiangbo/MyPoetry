@@ -14,7 +14,7 @@ class Seq2Seq(object):
             xvocab_size, yvocab_size,
             emb_dim, num_layers, ckpt_path,
             lr=0.0001, 
-            epochs=10, model_name='CoupletModel'):
+            epochs=10001, model_name='CoupletModel'):
 
         # attach these arguments to self
         self.xseq_len = xseq_len
@@ -166,14 +166,14 @@ class Seq2Seq(object):
         # run M epochs
         for i in range(self.epochs):
             try:
-                if i % 2 == 0:
+                if i % 100 == 0:
                     # print("i = ",i)
                     val_loss = self.eval_batches(sess, valid_set, 32)
                     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     print('epoch = %d,time = %s, val_loss = %f ' % (i,now,val_loss))
 
                 self.train_batch(sess, train_set)
-                if i % 3 == 0: 
+                if i % 1000 == 0: 
                     # saver.save(sess, self.ckpt_path + self.model_name + '.ckpt', global_step=i)
                     saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
                     # evaluate to get validation loss
@@ -186,9 +186,9 @@ class Seq2Seq(object):
                 self.session = sess
                 saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
                 return sess
-            saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
-            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print("time = %s" % (now,))
+        saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print("time = %s" % (now,))
 
     def restore_last_session(self):
         saver = tf.train.Saver()

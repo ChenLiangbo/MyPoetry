@@ -74,17 +74,17 @@ failed
 42 server
 [couplet]
 model: 1204 x 3 LSTM
-date:2017.5.23 16:50
+date:2017.5.24 11:00:00
 data2.py---In: up line -> down line
         ---In: down line -> up line
-shuffle: False
+shuffle: True,save train.test,valid to data directory
 
 
 21 server
 [couplet]
 model:512 x 2 LSTM
 data.py---In:up line -> down line
-date: 2017.5.23 18:14  ----> 
+date: 2017.5.24 11:00:00  ----> 
 shuffle: True,save train.test,valid to data directory
 
 -----------------------------------------------------------------------------------------

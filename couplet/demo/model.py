@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import datetime
 import sys
 import os
 
@@ -104,14 +105,7 @@ class Seq2Seq(object):
         __graph__()
         # sys.stdout.write('</log>')
         
-
-
-
-    '''
-        Training and Evaluation
-
-    '''
-
+        
     # get the feed dictionary
     def get_feed(self, X, Y, keep_prob):
         feed_dict = {self.enc_ip[t]: X[t] for t in range(self.xseq_len)}
@@ -152,11 +146,8 @@ class Seq2Seq(object):
     #   evaluates on valid set periodically
     #    prints statistics
     def train(self, train_set, valid_set, sess=None ):
-        
         # we need to save the model periodically
         saver = tf.train.Saver()
-
-
         # if no session is given
         if not sess:
             try:
@@ -178,7 +169,8 @@ class Seq2Seq(object):
                 if i % 2 == 0:
                     # print("i = ",i)
                     val_loss = self.eval_batches(sess, valid_set, 32)
-                    print('epoch = %d,val_loss = %f ' % (i,val_loss))
+                    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    print('epoch = %d,time = %s, val_loss = %f ' % (i,now,val_loss))
 
                 self.train_batch(sess, train_set)
                 if i % 3 == 0: 
@@ -187,12 +179,16 @@ class Seq2Seq(object):
                     # evaluate to get validation loss
                     # val_loss = self.eval_batches(sess, valid_set, 16) # TODO : and this
                     print('\nModel saved to disk at iteration #{}'.format(i))
+                    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    print("time = %s" % (now,))
             except KeyboardInterrupt: # this will most definitely happen, so handle it
                 print('Interrupted by user at iteration {}'.format(i))
                 self.session = sess
                 saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
                 return sess
             saver.save(sess, self.ckpt_path + self.model_name + '.ckpt')
+            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print("time = %s" % (now,))
 
     def restore_last_session(self):
         saver = tf.train.Saver()

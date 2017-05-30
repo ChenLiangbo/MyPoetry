@@ -3,7 +3,6 @@
 
 import json
 import datetime
-import numpy as np
 
 from model import Seq2Seq
 import data as data_util
@@ -14,13 +13,12 @@ from tornado import gen
 
 ddir = '../data/'
 
+
 def load_model(ddir):
     xdata = np.load(ddir + 'xdata.npy')
     ydata = np.load(ddir + 'ydata.npy')
 
     vocabulary = data_util.read_vocabulary(ddir)
-    word_to_num = dict(zip(vocabulary, range(len(vocabulary)))) # {".":0,",":1,"不":2,"人":3}
-    num_to_word = dict(zip(range(len(vocabulary)),vocabulary))
     xseq_len = trainX.shape[-1]
     yseq_len = trainY.shape[-1]
 
@@ -40,12 +38,8 @@ def load_model(ddir):
     return model,vocabulary
 
 
-
-
-
 class BaseHandler(tornado.web.RequestHandler):
 
-    # db_T0tables = dbOperator.T0tablesOperator
     def setGetRequestHeader(self):
     	'''deal with cross domain trouble '''
         self.set_header('Access-Control-Allow-Origin','*')
@@ -59,15 +53,22 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Headers',"x-requested-with,content-type")
     
 
-
-'''登录验证  使用post方法，接受username和password参数'''
 class CoupletHandler(BaseHandler):
+
+    def write_results(self,data,filename = ddir + 'server.log'):
+        fp = open(filename,'a',encoding = 'utf-8')
+        data = json.dumps(data,separators = (',',':'))
+        fp.write(data)
+        print("<write to file> ",data)
+        fp.close()
+
+
     def get(self):
         self.setGetRequestHeader()                	 
      	data = {"coupletUp":"chenlb","coupletDown":"chenliangbohk1688"}
-    	data = json.dumps(data,separators = (',',':'))  	
-        print("----------------------------------------")
+    	data = json.dumps(data,separators = (',',':'))
         self.write(data)
+
 
     def post(self):
         print("---------------------------running in CoupletHandler post--------------------------------")
@@ -96,6 +97,13 @@ class CoupletHandler(BaseHandler):
 
         data = json.dumps(data,separators = (',',':'))  
         self.write(data)
+        print("<return to client> ",data)
+
+        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log = {"time":time,"coupletUp":coupletUp,"coupletDown":coupletDown}
+        self.write_results(log)
+        print("\n")
+
 
 
 import tornado.httpserver

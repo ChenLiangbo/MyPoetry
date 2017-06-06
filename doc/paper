@@ -438,3 +438,9 @@ n1 = 64,n2 = 32
 [实验]
 数据集：ILSVRC 2013 ImageNet detection training partition 低分辨率33，
 结论：对于超分辨率的图像处理问题，存在这样几个事实：在网络结构固定的时候，滤波器越多效果越好，滤波器的卷积核越大效果越好，但是两者都是速度变慢。并不是层数越多越好，因为纯卷积，没有池化也没有全连接，因此对初始条件和超参数的选择都比较敏感，层数越多不容易收敛。
+
+
+=================================================================================
+[24]Attention-based Extraction of Structured Information from Street View Imagery
+=================================================================================
+[Abstract] REcognize street signs with CNNs,RNNs, attention based mechanism,dataset is FSNS,

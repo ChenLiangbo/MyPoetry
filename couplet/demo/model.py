@@ -86,8 +86,6 @@ class Seq2Seq(object):
                     self.enc_ip, self.dec_ip, stacked_lstm, xvocab_size, yvocab_size,emb_dim,
                     feed_previous=True)
 
-
-
             # now, for training,
             #  build loss function
 

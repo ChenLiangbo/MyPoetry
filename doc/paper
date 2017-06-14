@@ -423,7 +423,7 @@ W3 -> filter (c,f3,f3,n3)
 
 
 [参数设置]
-f1 = 9, f2 = 1, f3 = 5
+f1 = 9, f2 = 1, f3 = 5 
 n1 = 64,n2 = 32
 [稀疏编码方法]
 
@@ -440,7 +440,18 @@ n1 = 64,n2 = 32
 结论：对于超分辨率的图像处理问题，存在这样几个事实：在网络结构固定的时候，滤波器越多效果越好，滤波器的卷积核越大效果越好，但是两者都是速度变慢。并不是层数越多越好，因为纯卷积，没有池化也没有全连接，因此对初始条件和超参数的选择都比较敏感，层数越多不容易收敛。
 
 
-=================================================================================
-[24]Attention-based Extraction of Structured Information from Street View Imagery
-=================================================================================
-[Abstract] REcognize street signs with CNNs,RNNs, attention based mechanism,dataset is FSNS,
+================================================================================
+[24]Learning to Protect Communications with Adversarial Neural Cryptography
+================================================================================
+[摘要]神经网络是否可以使用密码来保护相互之间的通讯，两个神经网络Bob和Alice通信，Eve窃取两者之间的交流。
+[引言]神经网络不仅知道怎么样加密，还知道什么该加密
+
+[对称加密]
+Alice和Bob希望可靠通信，Eve想偷听他们的通信
+Alice: P + K -> C   (P,plaintext,C ciphertext,K,shared key)  加密（通过秘钥）
+Bob: C + K -> Pb   (Bob)                                     解密（通过秘钥）
+Eve: C -> Pe       (Eve)                                     解密（破解密码）
+One fresh key for a plaintext P   (一个明文使用一个共享密码来加密)
+
+网络结构：加密是一个全连接层，主要是用于学习异或加密手段，所用的数据都是浮点型，16位，明文使用高斯分布产生，密钥随机选取
+程序：tensorflow/models/adversarial_crypto/
